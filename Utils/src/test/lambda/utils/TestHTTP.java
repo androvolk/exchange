@@ -1,13 +1,18 @@
 package test.lambda.utils;
 
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.
-import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.client.api.Request;
+//import org.eclipse.jetty.client.HttpClient;
+//import org.eclipse.jetty.client.api.ContentResponse;
+//import org.eclipse.jetty.client.api.Request;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public final class TestHTTP
 {
-  private static HttpClient httpClient = null;
+//  private static HttpClient httpClient = null;
   
   
   public TestHTTP ()
@@ -15,34 +20,49 @@ public final class TestHTTP
     // TODO Auto-generated constructor stub
   }
 
+//  public static String call () throws Exception
+//  {
+//    Request req = null;
+//    ContentResponse resp = null;
+//    String result = null;
+//    
+//    if ( httpClient == null ) httpClient = new HttpClient();
+//    if ( ! httpClient.isRunning () )  httpClient.start ();
+//
+//    
+//    req = httpClient.newRequest ( "http://localhost:8080/hello" );
+//    req.getHeaders () .add ( "Content-Type", "application/json" );
+//System.out.println ( resp.getStatus () );
+////System.out.println ( resp.getEncoding () );
+//System.out.println ( result );
+//
+//    return result;
+//  }
+
   public static String call () throws Exception
   {
-    Request req = null;
-    ContentResponse resp = null;
-    String result = null;
-    
-    if ( httpClient == null ) httpClient = new HttpClient();
-    if ( ! httpClient.isRunning () )  httpClient.start ();
+//    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    
-    req = httpClient.newRequest ( "http://localhost:8080/hello" );
-    req.getHeaders () .add ( "Content-Type", "application/json" );
-    req.s
-    resp = req.send ();
-    result = new String ( resp.getContent () );
-System.out.println ( resp.getStatus () );
-//System.out.println ( resp.getEncoding () );
-System.out.println ( result );
+    OkHttpClient client = new OkHttpClient();
 
-    return result;
+    Request request = new Request.Builder () 
+                            .url ( "http://localhost:8080/" )
+                            .get ()
+                            .build ();        
+//    RequestBody body = RequestBody.create( JSON, json );
+//    Request request = new Request.Builder()
+//      .url(url)
+//      .post(body)
+//      .build();
+    Response response = client.newCall ( request ) .execute ();
+    return response.body().string();
   }
-
   
   // TODO: Remove after debugging!
   public static void main ( String [] args ) throws Exception
   {
-    call();
-    httpClient.stop ();
+    System.out.println (  call() );
+//    httpClient.stop ();
   }
 
 }
