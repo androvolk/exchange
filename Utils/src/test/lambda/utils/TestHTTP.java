@@ -41,21 +41,21 @@ public final class TestHTTP
 
   public static String call () throws Exception
   {
-//    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    final MediaType JSON = MediaType.parse ( "application/json; charset=utf-8" );
 
     OkHttpClient client = new OkHttpClient();
 
-    Request request = new Request.Builder () 
-                            .url ( "http://localhost:8080/" )
-                            .get ()
-                            .build ();        
-//    RequestBody body = RequestBody.create( JSON, json );
-//    Request request = new Request.Builder()
-//      .url(url)
-//      .post(body)
-//      .build();
-    Response response = client.newCall ( request ) .execute ();
-    return response.body().string();
+//    Request request = new Request.Builder () 
+//                            .url ( "http://localhost:8080/" )
+//                            .get ()
+//                            .build ();        
+    RequestBody body = RequestBody.create ( JSON, "{\"post\":\"test\"}" );
+    Request request = new Request.Builder ()
+      .url ( "http://localhost:8080/post_test" )
+      .post ( body )
+      .build ();
+    Response response = client .newCall ( request ) .execute ();
+    return response .body () .string();
   }
   
   // TODO: Remove after debugging!
