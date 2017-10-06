@@ -1,0 +1,2 @@
+Registering trigger emulation (For Windows body data after the -d key should be in DOUBLE quotes!)
+curl -X PUT http://localhost:8080/register_trigger -d "{triggerName:ZZZ,triggerUrl:\"https://xxx.yyy.zzz\",dirToMonitor:\"D:/Temp/@@@/zzz\"}"
