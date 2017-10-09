@@ -139,16 +139,15 @@ System.out.println ( "URL => " + result ); //!!!
   
   public static void main ( String [] args ) throws Exception
   {
-//    String uuid = getUuid ( HOST, PORT, LOGIN, PASSWORD );
-//    
-//    if ( uuid != null ) System.out.println ( "UUID from the CouchDB: " + uuid );
-//    else System.err.println ( "Unable to get UUID from CouchDB!" );
+    String uuid = getUuid ( HOST, PORT, LOGIN, PASSWORD );
+    
+    if ( uuid != null ) System.out.println ( "UUID from the CouchDB: " + uuid );
+    else System.err.println ( "Unable to get UUID from CouchDB!" );
     
     String result = createDocumentAttachment ( HOST, PORT, DB, LOGIN, PASSWORD, "300fce2c6360d9c33f71e2b0eb015113",
-        "1-a882265e52180d2d686fe2ed023ebb96", "xml", "/home/vagrant/demos/DJ/exchange/Build/dist/test.xml", "text/xml");
+        "2-5949068b7035e4bfc358c2cb0074cfbf", "xml", "/home/vagrant/demos/DJ/exchange/Build/dist/test.xml", "application/xml");
     System.out.println ( "Result ->  " + result);
     
-   /* String json = createDocumentWithFile ( null, "{\"shit\":\"fuck\", \"more_shit\":\"more_fuck\"}",  null ); */
   }
 
 }
