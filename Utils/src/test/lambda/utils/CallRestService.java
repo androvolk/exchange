@@ -1,5 +1,6 @@
 package test.lambda.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -12,6 +13,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -26,6 +28,11 @@ public final class CallRestService
   private static OkHttpClient client = null;
 
 
+  /**
+   * Converts JSON to set of Key-Value pairs packed into Map
+   * @param json JSON document
+   * @return Map where key is JSON attribute name and value is a JSON value
+   */
   @SuppressWarnings ( "rawtypes" )
   public static Map jsonToMap ( final String json ) 
   {
@@ -34,11 +41,17 @@ public final class CallRestService
   }
   
 
+  /**
+   * Calls REST GET command
+   * @param url URL of resource
+   * @return Result of the call in string format
+   * @throws IOException
+   */
   public static String get ( final String url ) throws IOException
   {
-    Request request = new Request.Builder()
-        .url(url)
-        .build();
+    Request request = new Request.Builder ()
+        .url ( url )
+        .build ();
 
     if ( client == null ) client = new OkHttpClient ();
     
@@ -46,120 +59,65 @@ public final class CallRestService
     { return response .body () .string (); }
   }
 
-  public static String put ( final String url, final String json) throws IOException
+
+  /**
+   * Calls REST PUT command.
+   * @param url URL of resource.
+   * @param payload Data that should be transfered in request body.
+   * @return Result of the call in string format.
+   * @throws IOException
+   */
+  public static String put ( final String url, final String payload ) throws IOException
   {
     if ( JSON == null ) JSON = MediaType.parse ( "application/json; charset=utf-8" );
     
-    RequestBody body = RequestBody.create(JSON, json);
-    Request request = new Request.Builder()
-        .url(url).put ( body )
-        .post(body)
-        .build();
+    RequestBody body = RequestBody.create ( JSON, payload );
+    Request request = new Request.Builder ()
+        .url ( url )
+        .put ( body )
+        .build ();
+
     if ( client == null ) client = new OkHttpClient ();
     
     try ( Response response = client .newCall ( request ) .execute () )
     { return response .body () .string (); }
   }
 
-//  private static Response request ( final String method, final String host, final int port, 
-//                            final String path, final String login, final String password, final String payload )
-//  {
-////    URL url = null;
-////   HttpURLConnection con = null;
-////    OutputStream os = null;
-//    String body = null;
-//    String prefix = "";
-//    
-//    if ( login != null && password != null ) prefix = login + ':' + password + '@';
-//    
-//    try
-//    {
-//      url = new URL ( "http://" + prefix + host + ":" + Integer.toString ( port ) + path );
-//System.out.println ( url.toString () );      //!!!
-//      con = ( HttpURLConnection ) url.openConnection ();
-//      con.setRequestMethod ( method );
-//      con.setRequestProperty ( "Content-Type", "application/json" );
-//      con.setDoOutput ( true );
-//      if ( payload != null )
-//      {
-////        con.setDoOutput ( true );
-//        os = con.getOutputStream ();
-//        os.write ( payload.getBytes ( "UTF-8" ) );
-//        os.flush ();
-//      }
-//      con.connect (); //???
-//      body = IOUtils.toString ( con.getInputStream () );
-//      
-//      return new Response ( con.getResponseCode (), body );
-//    }
-//    catch ( IOException e )
-//    {
-//      System.err.println ( "Request failed: " + e.getMessage () );
-//      e.printStackTrace ();
-//      return null;
-//    }
-//  }
+
+  // TODO: Test me gently!
+  public static String putWithFile ( final String url, final String fileResouceName,
+                                               final String pathToFile, final String mimeType ) throws IOException
+  {
+    File attachment = new File ( pathToFile );
+    RequestBody body = new MultipartBody.Builder ()
+        .setType ( MultipartBody.FORM )
+        .addFormDataPart ( fileResouceName, attachment.getName () ,
+          RequestBody.create ( MediaType.parse ( mimeType ), new File ( pathToFile ) ) ) 
+//          RequestBody.create ( MediaType.parse ( "application/octet-stream" ), 
+        .build();
+
+    Request request = new Request.Builder ()
+        .url ( url + "/" + fileResouceName )
+        .put ( body )
+        .build ();
+
+    if ( client == null ) client = new OkHttpClient ();
+    
+    try ( Response response = client .newCall ( request ) .execute () )
+    { return response .body () .string (); }
+  }
 
 
-//  public static Map requestJsonAsMap ( final String method, final String host, final int port, 
-//                             final String path, final String login, final String password, final String payload )
-//  {
-//    Response resp = null;
-//    
-//    resp = request ( method, host, port, path, login, password, payload );
-//    if ( resp == null ) return null;
-//    return resp.json ();
-//  }
 
-
-//  public static String requestJsonAsString ( final String method, final String host, final int port, 
-//                             final String path, final String login, final String password, final String payload )
-//  {
-//    Response resp = null;
-//    
-//    resp = request ( method, host, port, path, login, password, payload );
-//    if ( resp == null ) return null;
-//    return String.format ( "{\n\t\"status\": \"%d\",\n\t\"body\": \"%s\"\n}", Integer.valueOf ( resp.status ), resp.body );
-//  }
-
-
-//  private static class Response
-//  {
-//    public final String body;
-//    public final int status;
-//
-//    public Response ( int status, String body )
-//    {
-//      this.status = status;
-//      this.body = body;
-//    }
-//
-//    @SuppressWarnings ( "unchecked" )
-//    public Map < String, String > json ()
-//    {
-//      if ( gson == null ) gson = new Gson ();
-//      return ( Map < String, String > ) ( gson.fromJson ( body, HashMap.class ) );
-//    }
-//  }
-
-
+  // TODO: Remove after debugging
   public static void main ( String [] args ) throws Exception
   {
-    
-//    System.out.println ( CallRestService.request ( "GET", "localhost", 8080, "/service", null, null, null ) .status );
-//    System.out.println ( CallRestService.request ( "GET", "localhost", 8080, "/service", null, null, null ) .body );
     
     String json =  get ( "http://localhost:8080/post_test" );
     Map elements = jsonToMap ( json );
 
     System.out.println ( elements.get ( "Headers") );
 
-//    Map response = CallRestService.requestJsonAsMap ( "GET", "localhost", 8080, "/service", null, null, null );
-
- //   System.out.println ( response.get ( "status" ) );
-//    @SuppressWarnings ( "unchecked" )
-//    List < String > result = ( List < String > ) ( elements.get ( "result" ) );
-//    for ( String string : result ) { System.out.println ( string ); }
   }
 
 }
