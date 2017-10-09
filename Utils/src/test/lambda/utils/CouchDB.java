@@ -1,8 +1,14 @@
 package test.lambda.utils;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.DatatypeConverter;
 
 public final class CouchDB
 {
@@ -108,14 +114,19 @@ System.out.println ( "URL => " + result ); //!!!
   
   // TODO: Test me gently!
   public static String createDocumentAttachment ( final String host, final int port, final String dataBase,
-                                           final String login, final String password, final String id, 
-                                           final String fileResouceName, final String fullPathToFile, final String mimeType )
-                                                                                                           throws IOException
+                                         final String login, final String password, final String id, final String docRevision,
+                                         final String fileResouceName, final String fullPathToFile, final String mimeType )
+                                                                                                           throws IOException, NoSuchAlgorithmException
   {
     String result = null;
+ 
     
-    result = CallRestService.putWithFile ( makeUrl ( 
-                    host, port, dataBase, "/" + id , login, password ), fileResouceName, fullPathToFile, mimeType );
+//    MessageDigest md = MessageDigest.getInstance("MD5");
+//    md.update(docRevision.getBytes ());
+//    byte[] digest = md.digest();
+
+    result = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
+                                                          docRevision, fileResouceName, fullPathToFile, mimeType );
     if ( result == null )
     {
       System.err.println ( "CouchDB::createDocumentAttachment failed to add attachment!" );
@@ -134,7 +145,7 @@ System.out.println ( "URL => " + result ); //!!!
 //    else System.err.println ( "Unable to get UUID from CouchDB!" );
     
     String result = createDocumentAttachment ( HOST, PORT, DB, LOGIN, PASSWORD, "300fce2c6360d9c33f71e2b0eb015113",
-        "xml", "/home/vagrant/demos/DJ/exchange/Build/dist/test.xml", "text/xml");
+        "1-a882265e52180d2d686fe2ed023ebb96", "xml", "/home/vagrant/demos/DJ/exchange/Build/dist/test.xml", "text/xml");
     System.out.println ( "Result ->  " + result);
     
    /* String json = createDocumentWithFile ( null, "{\"shit\":\"fuck\", \"more_shit\":\"more_fuck\"}",  null ); */

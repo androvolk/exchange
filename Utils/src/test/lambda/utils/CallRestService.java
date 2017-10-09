@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -85,7 +86,7 @@ public final class CallRestService
 
 
   // TODO: Test me gently!
-  public static String putWithFile ( final String url, final String fileResouceName,
+  public static String putWithFile ( final String url, final String docRevision, final String fileResouceName,
                                                final String pathToFile, final String mimeType ) throws IOException
   {
     File attachment = new File ( pathToFile );
@@ -97,9 +98,13 @@ public final class CallRestService
         .build();
 
     Request request = new Request.Builder ()
-        .url ( url + "/" + fileResouceName )
+//        .url ( url + "/" + fileResouceName )
+        .url ( url + "/" + fileResouceName + "?rev=" + docRevision )
+//        .addHeader ( "ETag", "\"" + docRevision  + "\"" )//???
         .put ( body )
         .build ();
+System.out.println ( "Request: " + request.toString () );//!!!
+System.out.println ( "Headers: "  + request.headers () .toString () );
 
     if ( client == null ) client = new OkHttpClient ();
     
