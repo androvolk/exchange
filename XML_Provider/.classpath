@@ -9,5 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Spark-Java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/WebSocket"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OkHttp"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Utils"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

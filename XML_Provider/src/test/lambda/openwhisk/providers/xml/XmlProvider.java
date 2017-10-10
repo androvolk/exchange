@@ -7,10 +7,15 @@ import static spark.Spark.post;
 import static spark.Spark.stop;
 import static spark.Spark.after;
 import com.google.gson.Gson;
+
 import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import test.lambda.utils.CallRestService;
+import test.lambda.utils.CouchDB;
 
 
 public final class XmlProvider
@@ -21,6 +26,7 @@ public final class XmlProvider
   private static String triggerUrl = null;
   private static String dirToMonitor = null;
   private static int pollInterval = 5000;
+  private static String pollIntervalParam = null;
   private volatile static boolean isOn = false;
   private volatile static boolean isPaused = false;
   private volatile static boolean isBusy = false;
@@ -38,24 +44,14 @@ public final class XmlProvider
     new XmlProvider ();
     
     get ( "/hello", ( req, res ) -> "Hello World" );
-    get ( "/quit", ( req, res ) -> { stop (); return "Service Stopped!"; } );
     get ( "/service", ( req, res ) -> "{result: [ \"REST is cool!\", \"Well... Not that much!\" ] }" );
-    post ( "/post_test", ( req, res ) -> "{\n\t\"Headers\": \"" + req.headers () + "\",\n\tBody: " + req.body ()  + "\"\n}" ); //!!!
+    post ( "/quit", ( req, res ) -> { isOn = false; stop (); return "Service Stopped!"; } );
 
     // Process trigger registering
     put ( "/register_trigger", ( req, res ) -> {
-      //Gson gson = new Gson();
-      //String body = req.body ();
       Map < String, String > params = null;
-      try
-      { 
-//        @SuppressWarnings ( "unchecked" )
-        params = ( new Gson () .fromJson ( req.body (), HashMap.class ) );
-      }
-      catch ( Exception e ) 
-      {
-        System.out.println ( e.getMessage () );
-      }
+      try { params = ( new Gson () .fromJson ( req.body (), HashMap.class ) ); }
+      catch ( Exception e ) { System.out.println ( e.getMessage () ); }
       
       // Validate important parameters
       if ( params == null || params.size () < 3 ||
@@ -71,7 +67,14 @@ public final class XmlProvider
       triggerName = params.get ( "triggerName" );
       triggerUrl = params.get ( "triggerUrl" );
       dirToMonitor = params.get ( "dirToMonitor" );
+      pollIntervalParam = params.get ( "pollInterval" );
+      if ( pollIntervalParam != null ) pollInterval = Integer.parseInt ( pollIntervalParam );
       
+System.out.println ("triggerName -> " + triggerName  ); //!!!    
+System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!    
+System.out.println ("dirToMonitor -> " + dirToMonitor  ); //!!!    
+System.out.println ("pollIntervalParam -> " + pollIntervalParam  ); //!!!
+
       try {  //TODO: Remove after debugging!
         
       // Startup directory polling
@@ -83,7 +86,7 @@ public final class XmlProvider
         {
           try
           {
-System.out.print ( "===> 5" ); //!!!   
+System.out.println ( "Polling thread started" ); //!!!   
             while ( isOn == true )
             {
               System.out.print ( '.' ); //!!!
@@ -98,8 +101,22 @@ System.out.print ( "===> 5" ); //!!!
                     isBusy = true;
                     xml = file;
                     
+                    System.out.println ( "File found -> " + xml.getCanonicalPath () ); //!!!
+                    // TODO: Move hard-coded params to trigger params
+                    String doc = CouchDB.createDocument ( "127.0.0.1", 5984, "feed_files", "lambda_demo", "123456", null, "{\"current_processor\":\"XmlProvider\"}" );
+                    Map docFields = CallRestService.jsonToMap ( doc );
+                    System.out.println ("doc -> " + doc  ); //!!!
+                    System.out.println ("Map keys -> " + docFields.keySet () .toString ()  ); //!!!
+                    System.out.println ("Map values -> " + docFields.values () .toString ()  ); //!!!
+                    String _id = ( String ) docFields.get ( "id" );
+                    String _rev = ( String ) docFields.get ( "rev" );
+                    System.out.println ("_id -> " + _id  ); //!!!
+                    System.out.println ("_rev -> " + _rev  ); //!!!
+                    String attachment = CouchDB.createDocumentAttachment ( "127.0.0.1", 5984, "feed_files", "lambda_demo",
+                                "123456", _id, _rev, "xml", xml.getCanonicalPath (), "application/xml" );
+                    System.out.println ("response -> " + attachment  ); //!!!
                     // TODO: Process file here
-                    System.out.println ( file.getName () ); 
+                    
                     
                     xml.delete ();
                     isBusy = false; 
@@ -110,7 +127,7 @@ System.out.print ( "===> 5" ); //!!!
               Thread.sleep ( pollInterval );
             }
           } 
-          catch ( InterruptedException e ) { System.err.println ( e.getMessage () ); }
+          catch ( InterruptedException | IOException | NoSuchAlgorithmException  e ) { System.err.println ( e.getMessage () ); }
         } }, "XML-Provider-Dir-Poller" );
 
       } catch (Exception e) { System.err.println ( e.getMessage () ); } //TODO: Remove after debugging!

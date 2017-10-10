@@ -112,18 +112,28 @@ System.out.println ( "URL => " + result ); //!!!
   }
 
   
-  // TODO: Test me gently!
+  /**
+   * Asks CouchDB to attach file to existing document with particular ID and revision. 
+   * @param host
+   * @param port
+   * @param dataBase
+   * @param login
+   * @param password
+   * @param id
+   * @param docRevision
+   * @param fileResouceName
+   * @param fullPathToFile
+   * @param mimeType
+   * @return
+   * @throws IOException
+   * @throws NoSuchAlgorithmException
+   */
   public static String createDocumentAttachment ( final String host, final int port, final String dataBase,
                                          final String login, final String password, final String id, final String docRevision,
                                          final String fileResouceName, final String fullPathToFile, final String mimeType )
                                                                                                            throws IOException, NoSuchAlgorithmException
   {
     String result = null;
- 
-    
-//    MessageDigest md = MessageDigest.getInstance("MD5");
-//    md.update(docRevision.getBytes ());
-//    byte[] digest = md.digest();
 
     result = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
                                                           docRevision, fileResouceName, fullPathToFile, mimeType );
@@ -143,7 +153,9 @@ System.out.println ( "URL => " + result ); //!!!
     
     if ( uuid != null ) System.out.println ( "UUID from the CouchDB: " + uuid );
     else System.err.println ( "Unable to get UUID from CouchDB!" );
-    
+
+//    String result = createDocument ( HOST, PORT, DB, resource, login, password, id, jsonDocument );
+
     String result = createDocumentAttachment ( HOST, PORT, DB, LOGIN, PASSWORD, "300fce2c6360d9c33f71e2b0eb015113",
         "2-5949068b7035e4bfc358c2cb0074cfbf", "xml", "/home/vagrant/demos/DJ/exchange/Build/dist/test.xml", "application/xml");
     System.out.println ( "Result ->  " + result);

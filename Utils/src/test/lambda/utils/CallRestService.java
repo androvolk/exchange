@@ -85,26 +85,33 @@ public final class CallRestService
   }
 
 
-  // TODO: Test me gently!
+  /**
+   * Calls REST PUT command to upload the file.
+   * @param url URL of document resource.
+   * @param docRevision Updated document's revision
+   * @param fileResouceName Name of resource that will be assigned to uploaded file
+   * @param pathToFile Full path to the file being uploaded
+   * @param mimeType MIME type of file being uploaded
+   * @return Result of the call in string format.
+   * @throws IOException
+   */
   public static String putWithFile ( final String url, final String docRevision, final String fileResouceName,
                                                final String pathToFile, final String mimeType ) throws IOException
   {
     File attachment = new File ( pathToFile );
+
     RequestBody body = new MultipartBody.Builder ()
         .setType ( MultipartBody.FORM )
         .addFormDataPart ( fileResouceName, attachment.getName () ,
           RequestBody.create ( MediaType.parse ( mimeType ), new File ( pathToFile ) ) ) 
-//          RequestBody.create ( MediaType.parse ( "application/octet-stream" ), 
         .build();
 
     Request request = new Request.Builder ()
-//        .url ( url + "/" + fileResouceName )
         .url ( url + "/" + fileResouceName + "?rev=" + docRevision )
-//        .addHeader ( "ETag", "\"" + docRevision  + "\"" )//???
         .put ( body )
         .build ();
-System.out.println ( "Request: " + request.toString () );//!!!
-System.out.println ( "Headers: "  + request.headers () .toString () );
+System.out.println ( "Request: " + request.toString () );  //!!!
+System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
 
     if ( client == null ) client = new OkHttpClient ();
     
