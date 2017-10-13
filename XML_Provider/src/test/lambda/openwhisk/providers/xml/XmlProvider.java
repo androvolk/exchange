@@ -115,11 +115,12 @@ System.out.println ( "Polling thread started" ); //!!!
                     String attachment = CouchDB.createDocumentAttachment ( "127.0.0.1", 5984, "feed_files", "lambda_demo",
                                 "123456", _id, _rev, "xml", xml.getCanonicalPath (), "application/xml" );
                     System.out.println ("response -> " + attachment  ); //!!!
+                    xml.delete ();
+                    isBusy = false; 
+
                     // TODO: Process file here
                     
                     
-                    xml.delete ();
-                    isBusy = false; 
                     break;
                   }
                 }
