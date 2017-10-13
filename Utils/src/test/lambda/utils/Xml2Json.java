@@ -14,10 +14,4 @@ public final class Xml2Json
     return obj.toString ();
   }
 
-//  public static void main ( String [] args )
-//  {
-//    // TODO Remove after debugging!!!
-//    System.out.println ( convertXml2Json ( args [ 0 ] ) );
-//  }
-
 }
