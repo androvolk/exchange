@@ -1,6 +1,7 @@
 package test.lambda.utils;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -23,6 +24,9 @@ public final class Feed
     Gson gson = null;
     String response = null;
     String jsonDocument = null;
+    @SuppressWarnings ( "rawtypes" )
+    Map entries = null;
+    MissedParams missedParams = new MissedParams ();
  
     System.out.print ( "Creating feed..." );
 
@@ -33,10 +37,12 @@ public final class Feed
     jsonDocument = gson.toJson ( args );
     
 System.out.println ( "JSON -> " + jsonDocument );//!!!
+System.out.println ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/config" );//!!!
 
     response = CallRestService.put ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/config",  jsonDocument  );
-
-    if ( response == null )
+    entries = CallRestService.jsonToMap ( response );
+    
+    if ( entries.get ( "success" ) .equals ( "failure" ) )
     {
       System.err.println ( "Feed::create failed to configure new feed!" );
       return null;

@@ -71,7 +71,8 @@ public final class CallRestService
   public static String put ( final String url, final String payload ) throws IOException
   {
     if ( JSON == null ) JSON = MediaType.parse ( "application/json; charset=utf-8" );
-    
+System.out.println ( "PUT URL -> " + url );//!!!
+System.out.println ( "PUT payload  -> " + payload );//!!!    
     RequestBody body = RequestBody.create ( JSON, payload );
     Request request = new Request.Builder ()
         .url ( url )
@@ -79,6 +80,8 @@ public final class CallRestService
         .build ();
 
     if ( client == null ) client = new OkHttpClient ();
+
+System.out.println ( "PUT request  -> " + request );//!!!    
     
     try ( Response response = client .newCall ( request ) .execute () )
     { return response .body () .string (); }

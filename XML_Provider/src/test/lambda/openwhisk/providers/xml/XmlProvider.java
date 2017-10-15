@@ -23,6 +23,7 @@ import test.lambda.utils.CouchDB;
 public final class XmlProvider
 {
   private static final String STATUS_OK = "{\n\t\"status\": \"success\"\n\t\"success\": \"true\"\n}";
+  private static final String STATUS_ERROR = "{\n\t\"status\": \"failure\"\n\t\"success\": \"false\"\n}";
   private static final int HTTP_PORT = 8080;
 
   // Directory polling parameters
@@ -72,8 +73,10 @@ public final class XmlProvider
     post ( "/quit", ( req, res ) -> { isOn = false; stop (); return "Service Stopped!"; } );
 
     // Configure provider
-    post ( "/config", ( req, res ) ->
+    put ( "/config", ( req, res ) ->
     {
+  System.out.println ( "request -> " + req.params () );//!!!
+  System.out.println ( "PUT payload  -> " + req.body () );//!!!
       Map < String, String > params = null;
       try { params = ( new Gson () .fromJson ( req.body (), HashMap.class ) ); }
       catch ( Exception e ) { System.out.println ( e.getMessage () ); }
@@ -100,6 +103,14 @@ System.out.println ("dbName -> " + dbName  ); //!!!
 System.out.println ("dbLogin -> " + dbLogin  ); //!!!    
 System.out.println ("dbPassword -> " + dbPassword  ); //!!!    
 
+      // Check up if directory exist
+      if ( !  ( new File ( dirToMonitor ) ) .exists () )
+      {
+        System.err.println ( "Directory '" + dirToMonitor + "' doesn't exist! Configuration failed!" );
+        res.status ( 500 );
+        return STATUS_ERROR;
+      }
+
       return STATUS_OK;
     } );
 
@@ -120,7 +131,7 @@ System.out.println ("dbPassword -> " + dbPassword  ); //!!!
       else  return "{\n\t\"status\": \"failure\",\n\t\"success\": \"false\",\n\t" + 
                           "\"msg\": \"/register_trigger call failed due to missing trigger name!\"\n}";
 
-      triggerUrl = "https://" + triggerHost + "/api/v1/namespaces/guest/triggers/" + triggerName;
+      triggerUrl = "https://" + triggerHost + "/api/v1/namespaces/guest/triggers" + triggerName;
      
 System.out.println ("triggerHost -> " + triggerHost  ); //!!!    
 System.out.println ("triggerName -> " + triggerName  ); //!!!    
@@ -162,11 +173,12 @@ System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!
     {
       try
       {
-System.out.println ( "Polling thread started" ); //!!!   
+        System.out.println ( "Polling directory '" + dirToMonitor + "'" );
+        
+        // Polling keeps going until external signal to stop arrived
         while ( isOn == true )
         {
-          System.out.println ( "Polling directory '" + dirToMonitor + "'" );
-          System.out.print ( '.' ); //!!!
+System.out.print ( '.' ); //!!!
           if ( ! isPaused )
           {
             File [] fileList = dir.listFiles ();
@@ -207,7 +219,7 @@ System.out.println ( "Polling thread started" ); //!!!
      */
     private Map fireTrigger ( final Map params ) throws IOException
     {
-      if ( params == null || params.containsKey ( "id" ) || params.containsKey ( "rev" ) )
+      if ( params == null || ! params.containsKey ( "id" ) || ! params.containsKey ( "rev" ) )
       {
 System.err.println ( params ); //!!!
         System.err.println ( "Feed::fireTrigger received bad 'params'!" );
