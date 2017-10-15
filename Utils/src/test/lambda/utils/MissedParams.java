@@ -25,7 +25,7 @@ public final class MissedParams
    */
   public boolean add ( String paramName ) 
   { 
-    if ( thereAreMissedParameters () )
+    if ( hasMissedParameters () )
       return params.add ( ", " + paramName );
     else 
       return params.add ( paramName );
@@ -36,7 +36,7 @@ public final class MissedParams
    * Checks up if there are missed parameters.
    * @return <i>true</i> if some parameters are missed <i>false</i>
    */
-  public boolean thereAreMissedParameters () { return ( ! params.isEmpty () ); }
+  public boolean hasMissedParameters () { return ( ! params.isEmpty () ); }
 
 
   /**
@@ -49,7 +49,7 @@ public final class MissedParams
   @Override
   public String toString ( )
   {
-    if ( ! thereAreMissedParameters () ) return "No missed parameters! :)";
+    if ( ! hasMissedParameters () ) return "No missed parameters! :)";
     
     StringBuilder result = new StringBuilder ();
     params .stream () .forEach ( s -> result.append ( s ) ); 

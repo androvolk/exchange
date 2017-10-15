@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.google.gson.JsonObject;
 
 import test.lambda.utils.Feed;
+import test.lambda.utils.Result;
 
 public final class LambdaXmlFeedOpenWhisk
 {
@@ -38,71 +39,80 @@ System.out.println ( "Trigger name -> " + triggerName ); //!!!
       // Getting 'xml' parameter out of the call's input
       if ( lifecycleEvent.equals ( "CREATE" ) )
       {
-        output = Feed.create ( args );
-        if ( output == null ) result = failureWithMessage ( "Feed::create returned null!" );
-        else result = success ( output );
+        result = Feed.create ( args );
+//        output = Feed.create ( args );
+//        if ( output == null ) result = failureWithMessage ( "Feed::create returned null!" );
+        if ( Result.isFailed ( result )) 
+          System.out.println ( 
+              "LambdaXmlFeedOpenWhisk::main - Unable to create feed! Reason: " + Result.getMessage ( result ) );
       }
       else if ( lifecycleEvent.equals ( "DELETE" ) )
       {
-        output = Feed.delete ( args );
-        if ( output == null ) result = failureWithMessage ( "Feed::create returned null!" );
-        else result = success ( output );
+        result = Feed.delete ( args );
+//        if ( output == null ) result = failureWithMessage ( "Feed::create returned null!" );
+//        else result = success ( output );
+        if ( Result.isFailed ( result )) 
+          System.out.println ( 
+              "LambdaXmlFeedOpenWhisk::main - Unable to delete feed! Reason: " + Result.getMessage ( result ) );
+        
       }
-      else result = ignored ();
+      else result = Result.ignored ( "Unsupported life cycle event: '" + lifecycleEvent + "'");
       
     }
     catch ( IOException e )
     {
-      System.err.println ( "Feed::create generated IOException" );
-      result = failureWithMessage ( e.getMessage () );
+      System.err.println ( "Feed generated IOException" );
+//      result = failureWithMessage ( e.getMessage () );
+      result = Result.failure (
+                  "LambdaXmlFeedOpenWhisk::main - Feed generated IOException! Reason: " + e.getMessage () );
     }
 
     return result;
   }
 
   
-  /**
-   * Produces 'failure' reply
-   * @param message - message to insert in resulting JSON object
-   * @return failure JsonObject
-   */
-  private static JsonObject failureWithMessage ( final String message )
-  {
-    JsonObject result = new JsonObject ();
-    result.addProperty ( "status", "failure" );
-    result.addProperty ( "success", "false" );
-    result.addProperty ( "msg", message );
-    return result;
-  }
-
-  
-  /**
-   * Produces 'success' reply
-   * @param output - some output to insert in resulting JSON object
-   * @return success JsonObject
-   */
-  private static JsonObject success ( final String output )
-  {
-    JsonObject result = new JsonObject ();
-    result.addProperty ( "status", "success" );
-    result.addProperty ( "success", "true" );
-    result.addProperty ( "output", output );
-    return result;
-  }
-
-  
-  /**
-   * Produces 'ingored' reply
-   * Produces ignore JsonObject
-   * @return
-   */
-  private static JsonObject ignored ()
-  {
-    JsonObject result = new JsonObject ();
-    result.addProperty ( "status", "ignored" );
-    result.addProperty ( "success", "true" );
-    return result;
-  }
+//  /**
+//   * Produces 'failure' reply
+//   * @param message - message to insert in resulting JSON object
+//   * @return failure JsonObject
+//   */
+//  private static JsonObject failureWithMessage ( final String message )
+//  {
+//    JsonObject result = new JsonObject ();
+//    result.addProperty ( "status", "failure" );
+//    result.addProperty ( "success", "false" );
+//    result.addProperty ( "msg", message );
+//    return result;
+//  }
+//
+//  
+//  /**
+//   * Produces 'success' reply
+//   * @param output - some output to insert in resulting JSON object
+//   * @return success JsonObject
+//   */
+//  private static JsonObject success ( final String output )
+//  {
+//    JsonObject result = new JsonObject ();
+//    result.addProperty ( "status", "success" );
+//    result.addProperty ( "success", "true" );
+//    result.addProperty ( "output", output );
+//    return result;
+//  }
+//
+//  
+//  /**
+//   * Produces 'ingored' reply
+//   * Produces ignore JsonObject
+//   * @return
+//   */
+//  private static JsonObject ignored ()
+//  {
+//    JsonObject result = new JsonObject ();
+//    result.addProperty ( "status", "ignored" );
+//    result.addProperty ( "success", "true" );
+//    return result;
+//  }
 
  
 

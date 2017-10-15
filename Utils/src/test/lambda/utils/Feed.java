@@ -8,9 +8,9 @@ import com.google.gson.JsonObject;
 
 public final class Feed
 {
-  private static final String STATUS_OK = "{\n\t\"status\": \"success\"\n\t\"success\": \"true\"\n}";
-  private static String xmlProvHost = "127.0.0.1";
-  private static String xmlProvPort = "8080";
+//  private static final String STATUS_OK = "{\n\t\"status\": \"success\"\n\t\"success\": \"true\"\n}";
+  private static String xmlProvHost = null; //"127.0.0.1";
+  private static String xmlProvPort = null; //"8080";
 //  private static String dbHost = "127.0.0.1";
 //  private static int dbPort = 5984;
 //  private static String dbName = "feed_files";
@@ -18,8 +18,13 @@ public final class Feed
 //  private static String dbPassword = "123456";
 
   
-   
-  public static String create ( final JsonObject args ) throws IOException
+  /**
+   * Creates the feed.
+   * @param args - JsonObject containing all required parameters
+   * @return Result of operation as JsonObject with status, message, etc. 
+   * @throws IOException
+   */
+  public static JsonObject create ( final JsonObject args ) throws IOException
   {
     Gson gson = null;
     String response = null;
@@ -30,8 +35,18 @@ public final class Feed
  
     System.out.print ( "Creating feed..." );
 
-    if ( args.has ( "xmlProvHost" ) ) xmlProvHost = args. get ( "xmlProvHost" ) .getAsString ();
-    if ( args.has ( "xmlProvPort" ) ) xmlProvPort = args. get ( "xmlProvPort" ) .getAsString ();
+    // Obtain parameters from environment
+    if ( args.has ( "xmlProvHost" ) ) 
+      xmlProvHost = args. get ( "xmlProvHost" ) .getAsString ();
+    else
+      missedParams.add ( "xmlProvHost" );
+    if ( args.has ( "xmlProvPort" ) )
+      xmlProvPort = args. get ( "xmlProvPort" ) .getAsString ();
+    else
+      missedParams.add ( "xmlProvPort" );
+    
+    if ( missedParams.hasMissedParameters () )
+      return Result.failure ( "Feed::create - some parameters are missing: ( " + missedParams + " )");
     
     gson = new Gson ();
     jsonDocument = gson.toJson ( args );
@@ -60,13 +75,41 @@ System.out.println ( "response -> " + response );//!!!
 
 System.out.println ( "response -> " + response );//!!!
 
-    return STATUS_OK;
+    return Result.success ( "XML file feed successfully created" );
+//    return STATUS_OK;
   }
 
-  public static String delete ( JsonObject args )
+
+  /**
+   * Deletes the feed.
+   * @param args - JsonObject containing all required parameters
+   * @return Result as JsonObject with status, message, etc. 
+   * @throws IOException
+   */
+  public static JsonObject delete ( JsonObject args ) throws IOException
   {
-    // TODO Implement feed deleting logic
-    return STATUS_OK;
+    String response = null;
+    Gson gson = null;
+    String jsonDocument = null;
+
+    gson = new Gson ();
+    jsonDocument = gson.toJson ( args );
+    
+System.out.println ( "JSON -> " + jsonDocument );//!!!
+System.out.println ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/config" );//!!!
+    
+    response = CallRestService.put ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/unregister_trigger",  jsonDocument  );
+    
+    if ( response == null )
+    {
+      System.err.println ( "Feed::create failed to register trigger!" );
+      return null;
+    }
+
+System.out.println ( "response -> " + response );//!!!
+
+    return Result.success ( "XML file feed successfully deleted" );
+//    return STATUS_OK;
   }
 
 }

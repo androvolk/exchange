@@ -12,11 +12,11 @@ import javax.xml.bind.DatatypeConverter;
 
 public final class CouchDB
 {
-  private final static String HOST = "127.0.0.1";
-  private final static int PORT = 5984;
-  private final static String DB = "feed_files";
-  private final static String LOGIN = "lambda_demo";
-  private final static String PASSWORD = "123456";
+//  private final static String HOST = "127.0.0.1";
+//  private final static String PORT = "5984";
+//  private final static String DB = "feed_files";
+//  private final static String LOGIN = "lambda_demo";
+//  private final static String PASSWORD = "123456";
   
   /**
    * Generate URL for calling CouchDB REST API
@@ -28,20 +28,19 @@ public final class CouchDB
    * @param password
    * @return Valid URL to call the API
    */
-  public static String makeUrl ( final String host, final int port, final String dataBase, 
+  public static String makeUrl ( final String host, final String port, final String dataBase, 
                                             final String resource, final String login, final String password )
   {
-    String result = null;
+//    String result = null;
     String prefix = "";
     String infix = "";
     
     if ( login != null && password != null ) prefix = login + ':' + password + '@';
     if ( dataBase != null) infix = "/" + dataBase;
     
-    result = "http://" + prefix + host + ":" + port + infix + resource; 
+    return "http://" + prefix + host + ":" + port + infix + resource; 
 
-System.out.println ( "URL => " + result ); //!!!
-    return result;
+//    return result;
   }
 
 
@@ -54,7 +53,8 @@ System.out.println ( "URL => " + result ); //!!!
    * @return
    * @throws IOException
    */
-  public static String getUuid ( final String host, final int port, final String login, final String password ) throws IOException
+  public static String getUuid ( final String host, final String port, final String login, final String password )
+                                                                                                      throws IOException
   {
     @SuppressWarnings ( "rawtypes" )
     Map response = null;
@@ -85,30 +85,32 @@ System.out.println ( "URL => " + result ); //!!!
    * @return
    * @throws IOException
    */
-  public static String createDocument (  final String host, final int port, final String dataBase,
+  public static String createDocument (  final String host, final String port, final String dataBase,
                                          final String login, final String password, final String id, final String jsonDocument )
                                                                                                              throws IOException
   {
-    String result = null;
+//    String result = null;
     String uuid = null;
     
     if ( id == null )
     {
       uuid = getUuid ( host, port, login, password );
-      if ( uuid == null ) return null;
+      if ( uuid == null ) return Result.toJson ( 
+            Result.failure ( "CouchDB::createDocument - getUuide() was unable go generate ID for document!" ) );
     }
     
     
-    result = CallRestService.put ( makeUrl ( 
+    return CallRestService.put ( makeUrl ( 
+//    result = CallRestService.put ( makeUrl ( 
                     host, port, dataBase, "/" + ( id != null ? id : uuid ) , login, password ), jsonDocument );
 
-    if ( result == null )
-    {
-      System.err.println ( "CouchDB::createDocumentWithFile failed to create new document!" );
-      return null;
-    }
-  
-    return result;
+//    if ( result == null )
+//    {
+//      System.err.println ( "CouchDB::createDocumentWithFile failed to create new document!" );
+//      return null;
+//    }
+//  
+//    return result;
   }
 
   
@@ -128,38 +130,39 @@ System.out.println ( "URL => " + result ); //!!!
    * @throws IOException
    * @throws NoSuchAlgorithmException
    */
-  public static String createDocumentAttachment ( final String host, final int port, final String dataBase,
+  public static String createDocumentAttachment ( final String host, final String port, final String dataBase,
                                          final String login, final String password, final String id, final String docRevision,
                                          final String fileResouceName, final String fullPathToFile, final String mimeType )
-                                                                                                           throws IOException, NoSuchAlgorithmException
+                                                                                   throws IOException, NoSuchAlgorithmException
   {
-    String result = null;
+//    String result = null;
 
-    result = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
+    return CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
+//    result = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
                                                           docRevision, fileResouceName, fullPathToFile, mimeType );
-    if ( result == null )
-    {
-      System.err.println ( "CouchDB::createDocumentAttachment failed to add attachment!" );
-      return null;
-    }
-
-    return result;
+//    if ( result == null )
+//    {
+//      System.err.println ( "CouchDB::createDocumentAttachment failed to add attachment!" );
+//      return null;
+//    }
+//
+//    return result;
   }
  
   
-  public static void main ( String [] args ) throws Exception
-  {
-    String uuid = getUuid ( HOST, PORT, LOGIN, PASSWORD );
-    
-    if ( uuid != null ) System.out.println ( "UUID from the CouchDB: " + uuid );
-    else System.err.println ( "Unable to get UUID from CouchDB!" );
-
-//    String result = createDocument ( HOST, PORT, DB, resource, login, password, id, jsonDocument );
-
-    String result = createDocumentAttachment ( HOST, PORT, DB, LOGIN, PASSWORD, "300fce2c6360d9c33f71e2b0eb015113",
-        "2-5949068b7035e4bfc358c2cb0074cfbf", "xml", "/home/vagrant/demos/DJ/exchange/Build/dist/test.xml", "application/xml");
-    System.out.println ( "Result ->  " + result);
-    
-  }
+//  public static void main ( String [] args ) throws Exception
+//  {
+//    String uuid = getUuid ( HOST, PORT, LOGIN, PASSWORD );
+//    
+//    if ( uuid != null ) System.out.println ( "UUID from the CouchDB: " + uuid );
+//    else System.err.println ( "Unable to get UUID from CouchDB!" );
+//
+////    String result = createDocument ( HOST, PORT, DB, resource, login, password, id, jsonDocument );
+//
+//    String result = createDocumentAttachment ( HOST, PORT, DB, LOGIN, PASSWORD, "300fce2c6360d9c33f71e2b0eb015113",
+//        "2-5949068b7035e4bfc358c2cb0074cfbf", "xml", "/home/vagrant/demos/DJ/exchange/Build/dist/test.xml", "application/xml");
+//    System.out.println ( "Result ->  " + result);
+//    
+//  }
 
 }

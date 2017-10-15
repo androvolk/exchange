@@ -71,8 +71,10 @@ public final class CallRestService
   public static String put ( final String url, final String payload ) throws IOException
   {
     if ( JSON == null ) JSON = MediaType.parse ( "application/json; charset=utf-8" );
+
 System.out.println ( "PUT URL -> " + url );//!!!
 System.out.println ( "PUT payload  -> " + payload );//!!!    
+
     RequestBody body = RequestBody.create ( JSON, payload );
     Request request = new Request.Builder ()
         .url ( url )
@@ -124,15 +126,15 @@ System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
 
 
 
-  // TODO: Remove after debugging
-  public static void main ( String [] args ) throws Exception
-  {
-    
-    String json =  get ( "http://localhost:8080/post_test" );
-    Map elements = jsonToMap ( json );
-
-    System.out.println ( elements.get ( "Headers") );
-
-  }
+//  // TODO: Remove after debugging
+//  public static void main ( String [] args ) throws Exception
+//  {
+//    
+//    String json =  get ( "http://localhost:8080/post_test" );
+//    Map elements = jsonToMap ( json );
+//
+//    System.out.println ( elements.get ( "Headers") );
+//
+//  }
 
 }
