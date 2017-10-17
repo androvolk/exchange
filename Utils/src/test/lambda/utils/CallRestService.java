@@ -2,16 +2,6 @@ package test.lambda.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gson.Gson;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -20,27 +10,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import spark.utils.IOUtils;
-
 public final class CallRestService
 {
   private static MediaType JSON = null;
-  private static Gson gson = null;
   private static OkHttpClient client = null;
 
-
-  /**
-   * Converts JSON to set of Key-Value pairs packed into Map
-   * @param json JSON document
-   * @return Map where key is JSON attribute name and value is a JSON value
-   */
-  @SuppressWarnings ( "rawtypes" )
-  public static Map jsonToMap ( final String json ) 
-  {
-    if ( gson == null ) gson = new Gson ();
-    return gson.fromJson ( json, HashMap.class );
-  }
-  
 
   /**
    * Calls REST GET command

@@ -1,12 +1,11 @@
 package test.lambda.openwhisk.providers.xml;
 
-import static spark.Spark.port;
-import static spark.Spark.get;
-import static spark.Spark.put;
-import static spark.Spark.post;
-import static spark.Spark.stop;
 import static spark.Spark.after;
-import com.google.gson.Gson;
+import static spark.Spark.get;
+import static spark.Spark.port;
+import static spark.Spark.post;
+import static spark.Spark.put;
+import static spark.Spark.stop;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +13,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 import test.lambda.utils.CallRestService;
+import test.lambda.utils.Convert;
 import test.lambda.utils.CouchDB;
 import test.lambda.utils.MissedParams;
 import test.lambda.utils.Result;
@@ -24,6 +27,8 @@ import test.lambda.utils.Result;
 
 public final class XmlProvider
 {
+  private static final Logger logger = LoggerFactory.getLogger ( XmlProvider.class );
+
 //  private static final String STATUS_OK = "{\n\t\"status\": \"success\"\n\t\"success\": \"true\"\n}";
 //  private static final String STATUS_ERROR = "{\n\t\"status\": \"failure\"\n\t\"success\": \"false\"\n}";
   private static final int HTTP_PORT = 8080;
@@ -57,13 +62,22 @@ public final class XmlProvider
   
   public static void main ( String [] args ) throws RuntimeException
   {
+
+    // Configuring SLF4J logging facility
+    logger.trace("TRACE");
+    logger.info("INFO");
+    logger.debug("DEBUG");
+    logger.warn("WARN");
+    logger.error("ERROR");
+    
+    // Starting provider itself
     new XmlProvider ();
 
     // Setting HTTP listening port 
     port ( HTTP_PORT );
     
     // Let's show that we're alive
-    System.out.println ( "*******************************************************************************************" );
+    System.out.println ( "\n\n*******************************************************************************************" );
     System.out.println ( "*                                                                                         *" );
     System.out.println ( "*             Lambda Demo OpenWhisk XML Documents Provider    (c) 2017                    *" );
     System.out.println ( "*                                                                                         *" );
@@ -80,8 +94,8 @@ public final class XmlProvider
     {
       MissedParams missedParams = new MissedParams ();
 
-  System.out.println ( "/config request -> " + req.params () );//!!!
-  System.out.println ( "/config PUT payload  -> " + req.body () );//!!!
+System.out.println ( "/config request -> " + req.params () );//!!!
+System.out.println ( "/config PUT payload  -> " + req.body () );//!!!
 
       Map < String, String > params = null;
       try { params = ( new Gson () .fromJson ( req.body (), HashMap.class ) ); }
@@ -89,9 +103,10 @@ public final class XmlProvider
 
       // Validate important parameters
       if ( params == null )
-        return "{\n\t\"status\": \"failure\",\n\t\"success\": \"false\",\n\t" + 
-                                  "\"msg\": \"/config call failed due to parameters!\"\n}";
-
+//        return "{\n\t\"status\": \"failure\",\n\t\"success\": \"false\",\n\t" + 
+//                                  "\"msg\": \"/config call failed due to parameters!\"\n}";
+            return Result.toJson ( Result.failure ( "/config call failed due to parameters!" ) );
+        
       // Set new parameters values arrived with call instead of default ones
       if ( params.containsKey ( "dirToMonitor" ) )  dirToMonitor = params.get ( "dirToMonitor" );
       if ( params.containsKey ( "pollInterval" ) )  pollInterval = params.get ( "pollInterval" );
@@ -303,8 +318,8 @@ System.out.println ( "File found -> " + xmlToUpload.getCanonicalPath () ); //!!!
       
       response = CouchDB.createDocument ( 
                 dbHost, dbPort, dbName, dbLogin, dbPassword, null, "{\"current_processor\":\"XmlProvider\"}" );
-      if ( response == null ) return null;
-      jsonFields = CallRestService.jsonToMap ( response );
+ //     if ( response == null ) return Result.failure ( "DirPoller::uploadXmlToCouchDB - uploadXmlToCouchDB() returned null!" );
+      jsonFields = Convert.jsonToMap ( response );
       
 System.out.println ("CouchDB.createDocument response -> " + response  ); //!!!
 System.out.println ("Map keys -> " + jsonFields.keySet () .toString ()  ); //!!!
@@ -316,7 +331,7 @@ System.out.println ("Map values -> " + jsonFields.values () .toString ()  ); //!
 System.out.println ("_id -> " + id  ); //!!!
 System.out.println ("_rev -> " + rev  ); //!!!
       
-      response = CouchDB.createDocumentAttachment ( dbHost, dbPort, dbName, dbLogin, dbPassword,
+      response = CouchDB.uploadAttachment ( dbHost, dbPort, dbName, dbLogin, dbPassword,
                                       id, rev, "xml", xmlToUpload.getCanonicalPath (), "application/xml" );
 //      jsonFields = CallRestService.jsonToMap ( response );
 
@@ -325,7 +340,7 @@ System.out.println ("CouchDB.createDocumentAttachment response -> " + response  
       xmlToUpload.delete ();
 //      isBusy = false; //???
       
-      return  CallRestService.jsonToMap ( response );
+      return  Convert.jsonToMap ( response );
     }
   }
 
@@ -349,7 +364,7 @@ System.err.println ( params ); //!!!
                                                   "\",\n\t\"rev\":\"" + ( String ) params.get ( "rev" ) + "\"\n}" );
 System.out.println ("CallRestService.put response -> " + response  ); //!!!
 
-    return CallRestService.jsonToMap ( response );
+    return Convert.jsonToMap ( response );
   }
 
 }

@@ -36,14 +36,10 @@ public final class Feed
     System.out.print ( "Creating feed..." );
 
     // Obtain parameters from environment
-    if ( args.has ( "xmlProvHost" ) ) 
-      xmlProvHost = args. get ( "xmlProvHost" ) .getAsString ();
-    else
-      missedParams.add ( "xmlProvHost" );
-    if ( args.has ( "xmlProvPort" ) )
-      xmlProvPort = args. get ( "xmlProvPort" ) .getAsString ();
-    else
-      missedParams.add ( "xmlProvPort" );
+    if ( args.has ( "xmlProvHost" ) )  xmlProvHost = args. get ( "xmlProvHost" ) .getAsString ();
+    else missedParams.add ( "xmlProvHost" );
+    if ( args.has ( "xmlProvPort" ) )  xmlProvPort = args. get ( "xmlProvPort" ) .getAsString ();
+    else missedParams.add ( "xmlProvPort" );
     
     if ( missedParams.hasMissedParameters () )
       return Result.failure ( "Feed::create - some parameters are missing: ( " + missedParams + " )");
@@ -55,7 +51,10 @@ System.out.println ( "JSON -> " + jsonDocument );//!!!
 System.out.println ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/config" );//!!!
 
     response = CallRestService.put ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/config",  jsonDocument  );
-    entries = CallRestService.jsonToMap ( response );
+
+System.out.println ( "Call to /config response - > " + response );//!!!
+
+    entries = Convert.jsonToMap ( response );
     
     if ( entries.get ( "success" ) .equals ( "failure" ) )
     {
@@ -63,19 +62,18 @@ System.out.println ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/config" );
       return null;
     }
 
-System.out.println ( "response -> " + response );//!!!
-    
     response = CallRestService.put ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/register_trigger",  jsonDocument  );
     
+System.out.println ( "Call to /register_trigger response - > " + response );//!!!
+
     if ( response == null )
     {
       System.err.println ( "Feed::create failed to register trigger!" );
       return null;
     }
 
-System.out.println ( "response -> " + response );//!!!
 
-    return Result.success ( "XML file feed successfully created" );
+    return Result.success ( "XML files feed successfully created" );
 //    return STATUS_OK;
   }
 
@@ -100,15 +98,15 @@ System.out.println ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/config" );
     
     response = CallRestService.put ( "http://" + xmlProvHost + ":" +  xmlProvPort + "/unregister_trigger",  jsonDocument  );
     
+System.out.println ( "Call to /unregister_trigger - > " + response );//!!!
+
     if ( response == null )
     {
       System.err.println ( "Feed::create failed to register trigger!" );
       return null;
     }
 
-System.out.println ( "response -> " + response );//!!!
-
-    return Result.success ( "XML file feed successfully deleted" );
+    return Result.success ( "XML files feed successfully deleted" );
 //    return STATUS_OK;
   }
 

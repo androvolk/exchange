@@ -59,7 +59,7 @@ public final class CouchDB
     @SuppressWarnings ( "rawtypes" )
     Map response = null;
     
-    response = CallRestService.jsonToMap ( CallRestService.get (  makeUrl ( host, port, null, "/_uuids", login, password ) ) );
+    response = Convert.jsonToMap ( CallRestService.get (  makeUrl ( host, port, null, "/_uuids", login, password ) ) );
     if ( response == null ) return null;
     @SuppressWarnings ( "unchecked" )
     List < String > uuids = ( List < String > ) response.get ( "uuids" );
@@ -89,7 +89,7 @@ public final class CouchDB
                                          final String login, final String password, final String id, final String jsonDocument )
                                                                                                              throws IOException
   {
-//    String result = null;
+    String result = null;
     String uuid = null;
     
     if ( id == null )
@@ -100,17 +100,17 @@ public final class CouchDB
     }
     
     
-    return CallRestService.put ( makeUrl ( 
-//    result = CallRestService.put ( makeUrl ( 
+//    return CallRestService.put ( makeUrl ( 
+    result = CallRestService.put ( makeUrl ( 
                     host, port, dataBase, "/" + ( id != null ? id : uuid ) , login, password ), jsonDocument );
 
-//    if ( result == null )
-//    {
-//      System.err.println ( "CouchDB::createDocumentWithFile failed to create new document!" );
-//      return null;
-//    }
-//  
-//    return result;
+    if ( result == null )
+    {
+      System.err.println ( "CouchDB::createDocumentWithFile failed to create new document!" );
+      return null;
+    }
+  
+    return result;
   }
 
   
@@ -130,23 +130,23 @@ public final class CouchDB
    * @throws IOException
    * @throws NoSuchAlgorithmException
    */
-  public static String createDocumentAttachment ( final String host, final String port, final String dataBase,
+  public static String uploadAttachment ( final String host, final String port, final String dataBase,
                                          final String login, final String password, final String id, final String docRevision,
                                          final String fileResouceName, final String fullPathToFile, final String mimeType )
                                                                                    throws IOException, NoSuchAlgorithmException
   {
-//    String result = null;
+    String result = null;
 
-    return CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
-//    result = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
+//    return CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
+    result = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
                                                           docRevision, fileResouceName, fullPathToFile, mimeType );
-//    if ( result == null )
-//    {
-//      System.err.println ( "CouchDB::createDocumentAttachment failed to add attachment!" );
-//      return null;
-//    }
-//
-//    return result;
+    if ( result == null )
+    {
+      System.err.println ( "CouchDB::createDocumentAttachment failed to add attachment!" );
+      return null;
+    }
+
+    return result;
   }
  
   

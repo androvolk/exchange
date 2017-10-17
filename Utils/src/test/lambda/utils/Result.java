@@ -66,7 +66,7 @@ public final class Result
    * @param result - JsonObject to check
    * @return <i>true</i> if result's status is 'success', <i>false</i> otherwise
    */
-  public static boolean isSuccess ( final JsonObject result )
+  public static boolean isStatusSuccess ( final JsonObject result )
   {
     return result. get ( "status" ) .getAsString () .equals ( "success" );
   }
@@ -77,7 +77,7 @@ public final class Result
    * @param result - JsonObject to check
    * @return <i>true</i> if result's status is 'failure', <i>false</i> otherwise
    */
-  public static boolean isFailure ( final JsonObject result )
+  public static boolean isStatusFailure ( final JsonObject result )
   {
     return result. get ( "status" ) .getAsString () .equals ( "failure" );
   }
@@ -88,7 +88,7 @@ public final class Result
    * @param result - JsonObject to check
    * @return <i>true</i> if result's status is 'ignored', <i>false</i> otherwise
    */
-  public static boolean isIgnored ( final JsonObject result )
+  public static boolean isStatusIgnored ( final JsonObject result )
   {
     return result. get ( "status" ) .getAsString () .equals ( "ignored" );
   }
