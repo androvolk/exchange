@@ -24,7 +24,7 @@ public final class LambdaXmlFeedOpenWhisk
     String triggerName = null;
     JsonObject result = null;
     
-    System.out.println ( "LambdaXmlFeedOpenWhisk feed acction called" ); //!!!
+    System.out.println ( "LambdaXmlFeedOpenWhisk feed action called" ); //!!!
     
     lifecycleEvent = args .get ( "lifecycleEvent" ) .getAsString ();
     triggerName = args .get ( "triggerName" ) .getAsString (); //!!!
@@ -36,10 +36,10 @@ System.out.println ( "Trigger name -> " + triggerName ); //!!!
 
     try
     {
-      // Getting 'xml' parameter out of the call's input
       if ( lifecycleEvent.equals ( "CREATE" ) )
       {
         result = Feed.create ( args );
+System.out.println ( "LambdaXmlFeedOpenWhisk::main::lifecycleEvent.equals ( \"CREATE\" )  -> " + result ); //!!!
 //        output = Feed.create ( args );
 //        if ( output == null ) result = failureWithMessage ( "Feed::create returned null!" );
         if ( Result.isFailed ( result )) 
@@ -61,7 +61,7 @@ System.out.println ( "Trigger name -> " + triggerName ); //!!!
     }
     catch ( IOException e )
     {
-      System.err.println ( "Feed generated IOException" );
+      System.err.println ( "Feed generated IOException! Reason: " + e.getMessage () );
 //      result = failureWithMessage ( e.getMessage () );
       result = Result.failure (
                   "LambdaXmlFeedOpenWhisk::main - Feed generated IOException! Reason: " + e.getMessage () );

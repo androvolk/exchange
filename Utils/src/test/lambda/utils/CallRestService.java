@@ -3,6 +3,9 @@ package test.lambda.utils;
 import java.io.File;
 import java.io.IOException;
 
+import com.google.gson.JsonObject;
+
+import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -18,11 +21,12 @@ public final class CallRestService
 
   /**
    * Calls REST GET command
-   * @param url URL of resource
-   * @return Result of the call in string format
+   * @param url - URL of resource.
+   * @return Result of the call.
    * @throws IOException
    */
-  public static String get ( final String url ) throws IOException
+  public static JsonObject get ( final String url ) throws IOException
+//  public static String get ( final String url ) throws IOException
   {
     Request request = new Request.Builder ()
         .url ( url )
@@ -31,18 +35,22 @@ public final class CallRestService
     if ( client == null ) client = new OkHttpClient ();
     
     try ( Response response = client .newCall ( request ) .execute () )
-    { return response .body () .string (); }
+//    { return response .body () .string (); }
+    { return decodeResponse ( response ); }
+    
+    
   }
 
 
   /**
    * Calls REST PUT command.
-   * @param url URL of resource.
-   * @param payload Data that should be transfered in request body.
-   * @return Result of the call in string format.
+   * @param url - URL of resource.
+   * @param - payload Data that should be transfered in request body.
+   * @return Result of the call.
    * @throws IOException
    */
-  public static String put ( final String url, final String payload ) throws IOException
+  public static JsonObject put ( final String url, final String payload ) throws IOException
+//  public static String put ( final String url, final String payload ) throws IOException
   {
     if ( JSON == null ) JSON = MediaType.parse ( "application/json; charset=utf-8" );
 
@@ -58,23 +66,31 @@ System.out.println ( "PUT payload  -> " + payload );//!!!
     if ( client == null ) client = new OkHttpClient ();
 
 System.out.println ( "PUT request  -> " + request );//!!!    
-    
-    try ( Response response = client .newCall ( request ) .execute () )
-    { return response .body () .string (); }
+
+Call call = client .newCall ( request ); //!!!
+System.out.println ( "call  -> " + call );//!!!    
+Response response =  call.execute ();
+System.out.println ( "call::execute response  -> " + response );//!!!    
+
+
+/*    try ( Response response = client .newCall ( request ) .execute () )*/
+//    { return response .body () .string (); }
+    { return decodeResponse ( response ); }
   }
 
 
   /**
    * Calls REST PUT command to upload the file.
-   * @param url URL of document resource.
-   * @param docRevision Updated document's revision
-   * @param fileResouceName Name of resource that will be assigned to uploaded file
-   * @param pathToFile Full path to the file being uploaded
-   * @param mimeType MIME type of file being uploaded
-   * @return Result of the call in string format.
+   * @param url - URL of document resource.
+   * @param docRevision - Updated document's revision
+   * @param fileResouceName - Name of resource that will be assigned to uploaded file
+   * @param pathToFile - Full path to the file being uploaded
+   * @param mimeType - MIME type of file being uploaded
+   * @return Result of the call.
    * @throws IOException
    */
-  public static String putWithFile ( final String url, final String docRevision, final String fileResouceName,
+  public static JsonObject putWithFile ( final String url, final String docRevision, final String fileResouceName,
+//  public static String putWithFile ( final String url, final String docRevision, final String fileResouceName,
                                                final String pathToFile, final String mimeType ) throws IOException
   {
     File attachment = new File ( pathToFile );
@@ -89,26 +105,52 @@ System.out.println ( "PUT request  -> " + request );//!!!
         .url ( url + "/" + fileResouceName + "?rev=" + docRevision )
         .put ( body )
         .build ();
+    
 System.out.println ( "Request: " + request.toString () );  //!!!
 System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
 
     if ( client == null ) client = new OkHttpClient ();
     
     try ( Response response = client .newCall ( request ) .execute () )
-    { return response .body () .string (); }
+//    { return response .body () .string (); }
+    { return decodeResponse ( response ); }
+
   }
 
+  
+  /**
+   * Analyzes OkHttp Response object and returns appropriate Gson JsonObject result.
+   * @param response - JSON reply from the REST service as a string.
+   * @return Success or failure JsonObject with with REST response body packed into 'value' field.
+   * @throws IOException 
+   */
+  private static JsonObject decodeResponse ( final Response response ) throws IOException
+  {
+    JsonObject result = null;
+    JsonObject value = null;
+    
+System.out.println ( "Inside the CallRestService::decodeResponse" );//!!!
+System.out.println ( "response code -> " + response.code () );//!!!
+    
+    if ( response.isSuccessful () )
+    {
+System.out.println ( "CallRestService::decodeResponse - success" );//!!!
 
+      value = Convert.jsonToJsonObject ( response .body () .string () );
+System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
+      result = Result.success ( value );
+    }
+    else
+    {
+System.err.println ( "CallRestService::decodeResponse - failure" );//!!!
+      value = Convert.jsonToJsonObject ( response .body () .string () );
+System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
+      result = Result.failure ( value );
+    }
 
-//  // TODO: Remove after debugging
-//  public static void main ( String [] args ) throws Exception
-//  {
-//    
-//    String json =  get ( "http://localhost:8080/post_test" );
-//    Map elements = jsonToMap ( json );
-//
-//    System.out.println ( elements.get ( "Headers") );
-//
-//  }
+System.out.println ( "Leaving the CallRestService::decodeResponse" );//!!!
+    
+    return result;
+  }
 
 }

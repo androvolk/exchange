@@ -66,7 +66,6 @@ public final class XmlProvider
   
   public static void main ( String [] args ) throws RuntimeException
   {
-
     // Configuring SLF4J logging facility
     logger.trace("TRACE");
     logger.info("INFO");
@@ -86,13 +85,24 @@ public final class XmlProvider
     System.out.println ( "  *             Lambda Demo OpenWhisk XML Documents Provider    (c) 2017                    *" );
     System.out.println ( "  *                                                                                         *" );
     System.out.println ( "  *******************************************************************************************\n\n" );
+
+ System.out.println ( "xxx" ); //!!!   
+// ---------------------- /hello - Simple ping to be sure that provider is alive  ----------------------------------
     
     // Simple Ping method to see that provider is Ok
     get ( "/hello", ( req, res ) -> "Hello World" );
+System.out.println ( "yyy" );//!!!
+
+    
+// ---------------------- /quit - Shutting down the provider ---------------------------------------------------------
     
     // Shut down the provider
     post ( "/quit", ( req, res ) -> { isOn = false; stop (); return "Service Stopped!"; } );
+System.out.println ( "zzz" );//!!!
 
+    
+// ---------------------- /config - Configuring provider -------------------------------------------------------
+    
     // Configure provider
     put ( "/config", ( req, res ) ->
     {
@@ -113,7 +123,8 @@ System.out.println ( "#1 ");//!!!
 //        return "{\n\t\"status\": \"failure\",\n\t\"success\": \"false\",\n\t" + 
 //                                  "\"msg\": \"/config call failed due to parameters!\"\n}";
 //            return Result.toJson ( Result.failure ( "/config call failed due to parameters!" ) );
-        return ( Result.toJson ( Result.failure ( "/config call failed due to parameters!" ) ) );
+        return ( Convert.jsonObjectToJson ( Result.failure ( "/config call failed due to parameters!" ) ) );
+//        return ( Result.toJson ( Result.failure ( "/config call failed due to parameters!" ) ) );
 System.out.println ( "#2 ");//!!!
 
       if ( params.has ( "dirToMonitor" ) )  dirToMonitor = params .get ( "dirToMonitor" ) .getAsString ();
@@ -160,7 +171,7 @@ System.out.println ( "#3 ");//!!!
 //System.out.println ( "#3 ");//!!!
 
       if ( missedParams.hasMissedParameters () )
-        return Result.toJson ( 
+        return Convert.jsonObjectToJson ( 
                   Result.failure ( "/config - some parameters are missing: ( " + missedParams + " )" ) );
 System.out.println ( "#4 ");//!!!
 
@@ -180,15 +191,16 @@ System.out.println ( "#5 ");//!!!
         System.err.println ( "Directory '" + dirToMonitor + "' doesn't exist! Configuration failed!" );
 //        res.status ( 500 );//???
 //        return STATUS_ERROR;
-        return Result.toJson ( 
+        return Convert.jsonObjectToJson ( 
                   Result.failure ( "/config - Directory '" + dirToMonitor + 
                         "' doesn't exist! Configuration failed! " ) );
       }
 
 //      return STATUS_OK;
-      return Result.toJson ( Result.success ( "/config - Confuguration succeeded" ) );
+      return Convert.jsonObjectToJson ( Result.success ( "/config - Confuguration succeeded" ) );
     } );
 
+ 
 // ---------------------- /register_trigger - Process trigger registering ----------------------------------
     
     put ( "/register_trigger", ( req, res ) -> 
@@ -211,7 +223,7 @@ System.out.println ( "#7 ");//!!!
 System.out.println ( "#8 ");//!!!
         String msg = e.getMessage ();
         System.err.println ( "/register_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg );
-        return Result.toJson ( 
+        return Convert.jsonObjectToJson (
             Result.failure ( "/register_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg ) );
       }
       
@@ -226,7 +238,7 @@ System.out.println ( "#8 ");//!!!
 //      else missedParams.add ( "triggerName" );
 
       if ( missedParams.hasMissedParameters () )
-        return Result.toJson ( 
+        return Convert.jsonObjectToJson (
                   Result.failure ( "/register_trigge - some parameters are missing: ( " + missedParams + " )" ) );
 
       // Construct valid trigger URL of request parameters
@@ -249,11 +261,12 @@ System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!
       
       // Operation succeeded
 //      return STATUS_OK;
-      return Result.toJson ( Result.success ( "/register_trigger - Trigger established" ) );
+      return Convert.jsonObjectToJson ( Result.success ( "/register_trigger - Trigger established" ) );
     } );
     
+
+// ---------------------- /unregister_trigger - Process trigger disconnection  ----------------------------------
     
-    // Process trigger registering
     put ( "/unregister_trigger", ( req, res ) -> 
     {
       
@@ -264,34 +277,51 @@ System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!
       try { params = Convert.jsonToJsonObject ( req.body () ); }//???
       catch ( Exception e ) 
       { 
+System.out.println ( "Exception - > " + e.getMessage () );//!!!
+
         String msg = e.getMessage ();
         System.err.println ( "/unregister_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg );
-        return Result.toJson ( 
+        return Convert.jsonObjectToJson (
             Result.failure ( "/unregister_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg ) );
       }
+
+System.out.println ( "jsonToJsonObject is OK" );//!!!
+System.out.println ( "params -> " + params ); //!!!
+
       
 //      if ( params.containsKey ( "triggerName" ) )
       if ( params. has ( "triggerName" ) )
       {
+System.out.println ( "params. has ( \"triggerName\" ) " );//!!!
+System.out.println ( "triggerName -> " + triggerName );//!!!
 //        if ( params .get ( "triggerName" ) .equals ( triggerName ) )
-        if ( params .get ( "triggerName" ) .getAsString () .equals ( triggerName ) )
+System.out.println ( triggerName != null ? triggerName : "null????" );
+        if ( triggerName != null && params .get ( "triggerName" ) .getAsString () .equals ( triggerName ) )
         {
+System.out.println ( "triggerName matched" );//!!!
+
           isOn = false;
           triggerHost = null;
           triggerName = null;
           triggerUrl = null;
         }
-        else return Result.toJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) );
+//        else { System.out.println ( params .get ( "triggerName" ) .getAsString () ); return Result.toJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) );}
+        else { String json =  Convert.jsonObjectToJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) ) ; System.out.println ( "json -> " + json ); return json;  };
+System.out.println ( "params. has ( \"triggerName\" ) - out" );//!!!
 
       }
-      else return Result.toJson ( Result.failure ( "/unregister_trigger - Parameter 'triggerName' is missed!" ) );
+      else return Convert.jsonObjectToJson ( Result.failure ( "/unregister_trigger - Parameter 'triggerName' is missed!" ) );
+System.out.println ( "Before return Result.toJson ( Result.success ( \"/unregister_trigger - Trigger disconnected\" )" );//!!!
       
       // Operation succeeded
-      return Result.toJson ( Result.success ( "/unregister_trigger - Trigger disconnected" ) );
+      return Convert.jsonObjectToJson ( Result.success ( "/unregister_trigger - Trigger disconnected" ) );
     } );
     
     // Add MIME type header to every call's header
     after ( ( req, res ) -> { res.type ( "application/json" ); } );
+    
+System.out.println ( "end of main ()" );//!!!
+
   }
 
   

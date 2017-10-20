@@ -9,11 +9,13 @@ public final class LambdaXml2JsonOpenWhisk
 
   public static JsonObject main ( JsonObject args )
   {
-
+    String id = null;
+    String rev = null;
     String xml = null;
     String json = null;
     JsonObject result = null;
-    
+
+    if ( args .has ( "id" ))
     // Getting 'xml' parameter out of the call's input
     if ( ! args.has ( "xml" ) ) System.err.println ( "The 'xml' parameter missing!" );
     else

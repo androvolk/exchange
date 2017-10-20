@@ -12,6 +12,37 @@ public final class Result
 
   /**
    * Generates JsonObject with <i>success</i> status.
+   * @return Full-filed JsonObject 
+   */
+  public static JsonObject success ()
+  {
+    JsonObject result = new JsonObject ();
+    
+    result.addProperty ( "status", "success" );
+    result.addProperty ( "success", "true" );
+
+    return result;
+  }
+  
+  /**
+   * Generates JsonObject with <i>success</i> status.
+   * @param value - Some value to add or <i>null</i> to skip value addition
+   * @return Full-filed JsonObject 
+   */
+  public static JsonObject success ( final JsonObject value )
+  {
+    JsonObject result = new JsonObject ();
+    
+    result.addProperty ( "status", "success" );
+    result.addProperty ( "success", "true" );
+    if ( value != null ) result.add ( "value", value );
+
+    return result;
+  }
+  
+  
+  /**
+   * Generates JsonObject with <i>success</i> status.
    * @param message - Message to add or <i>null</i> to skip message addition
    * @return Full-filed JsonObject 
    */
@@ -22,6 +53,38 @@ public final class Result
     result.addProperty ( "status", "success" );
     result.addProperty ( "success", "true" );
     if ( message != null ) result.addProperty ( "msg", message );
+
+    return result;
+  }
+  
+  
+  /**
+   * Generates JsonObject with <i>failure</i> status.
+   * @return Full-filed JsonObject 
+   */
+  public static JsonObject failure ()
+  {
+    JsonObject result = new JsonObject ();
+    
+    result.addProperty ( "status", "failure" );
+    result.addProperty ( "success", "false" );
+
+    return result;
+  }
+  
+  
+  /**
+   * Generates JsonObject with <i>failure</i> status.
+   * @param value - Some value to add or <i>null</i> to skip value addition
+   * @return Full-filed JsonObject 
+   */
+  public static JsonObject failure ( final JsonObject value )
+  {
+    JsonObject result = new JsonObject ();
+    
+    result.addProperty ( "status", "failure" );
+    result.addProperty ( "success", "false" );
+    if ( value != null ) result.add ( "value", value );
 
     return result;
   }
@@ -46,6 +109,42 @@ public final class Result
 
   /**
    * Generates JsonObject with <i>ignored</i> status.
+   * @return Full-filed JsonObject 
+   */
+  public static JsonObject ignored ()
+  {
+    JsonObject result = new JsonObject ();
+    
+    result.addProperty ( "status", "ignored" );
+    result.addProperty ( "success", "true" );
+
+System.out.println ( "ignored() result -> " + result );
+
+    return result;
+  }
+  
+  
+  /**
+   * Generates JsonObject with <i>ignored</i> status.
+   * @param value - Some value to add or <i>null</i> to skip value addition
+   * @return Full-filed JsonObject 
+   */
+  public static JsonObject ignored ( final JsonObject value )
+  {
+    JsonObject result = new JsonObject ();
+    
+    result.addProperty ( "status", "success" );
+    result.addProperty ( "success", "true" );
+    if ( value != null ) result.add ( "value", value );
+
+System.out.println ( "ignored() result -> " + result );
+
+    return result;
+  }
+  
+
+  /**
+   * Generates JsonObject with <i>ignored</i> status.
    * @param message - Message to add or <i>null</i> to skip message addition
    * @return Full-filed JsonObject 
    */
@@ -56,6 +155,8 @@ public final class Result
     result.addProperty ( "status", "ignored" );
     result.addProperty ( "success", "true" );
     if ( message != null ) result.addProperty ( "msg", message );
+
+System.out.println ( "ignored() result -> " + result );
 
     return result;
   }
@@ -131,14 +232,28 @@ public final class Result
 
 
   /**
-   * Converts JsonObject result object to JSON document
-   * @param result - JsonObject result object
-   * @return JSON representation of result
+   * Returns value attached to result object.
+   * @param result - JsonObject to get value from
+   * @return Value attached to the result object, empty string otherwise
    */
-  public static String toJson ( final JsonObject result )
+  public static JsonObject getValue ( final JsonObject result )
   {
-    Gson gson = new Gson ();
-    return gson.toJson ( result );
+    if ( result.has ( "value" ) ) 
+      return result. get ( "value" ) .getAsJsonObject ();
+    else
+      return null;
   }
+
   
+//  /**
+//   * Converts JsonObject result object to JSON document
+//   * @param result - JsonObject result object
+//   * @return JSON representation of result
+//   */
+//  public static String toJson ( final JsonObject result )
+//  {
+//    Gson gson = new Gson ();
+//    return gson.toJson ( result );
+//  }
+//
 }
