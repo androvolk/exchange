@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.google.gson.JsonObject;
 
 import okhttp3.Call;
+import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -43,6 +44,39 @@ public final class CallRestService
 
 
   /**
+   * Calls REST POST command.
+   * @param url - URL of resource.
+   * @param login - payload Data that should be transfered in request body.
+   * @param password - Login for authentication at the resource.
+   * @param payload - Password for authentication at the resource.
+   * @returnResult of the call.
+   * @throws IOException
+   */
+  public static JsonObject post ( final String url, final String login, final String password, final String payload ) 
+                                                                                                      throws IOException
+  {
+    if ( JSON == null ) JSON = MediaType.parse ( "application/json; charset=utf-8" );
+
+System.out.println ( "POST URL -> " + url );//!!!
+System.out.println ( "POST payload  -> " + payload );//!!!    
+
+    RequestBody body = RequestBody.create ( JSON, payload );
+    Request request = new Request.Builder ()
+        .url ( url )
+        .addHeader ( "Authorization", Credentials.basic ( login, password ) )
+        .post ( body )
+        .build ();
+
+    if ( client == null ) client = new OkHttpClient ();
+
+System.out.println ( "POST request  -> " + request );//!!!    
+
+    try ( Response response = client .newCall ( request ) .execute () )
+    { return decodeResponse ( response ); }
+  }
+
+
+  /**
    * Calls REST PUT command.
    * @param url - URL of resource.
    * @param - payload Data that should be transfered in request body.
@@ -67,13 +101,13 @@ System.out.println ( "PUT payload  -> " + payload );//!!!
 
 System.out.println ( "PUT request  -> " + request );//!!!    
 
-Call call = client .newCall ( request ); //!!!
-System.out.println ( "call  -> " + call );//!!!    
-Response response =  call.execute ();
-System.out.println ( "call::execute response  -> " + response );//!!!    
+//Call call = client .newCall ( request ); //!!!
+//System.out.println ( "call  -> " + call );//!!!    
+//Response response =  call.execute ();
+//System.out.println ( "call::execute response  -> " + response );//!!!    
 
 
-/*    try ( Response response = client .newCall ( request ) .execute () )*/
+    try ( Response response = client .newCall ( request ) .execute () )
 //    { return response .body () .string (); }
     { return decodeResponse ( response ); }
   }

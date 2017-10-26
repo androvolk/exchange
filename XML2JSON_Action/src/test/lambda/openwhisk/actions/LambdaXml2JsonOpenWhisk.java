@@ -2,6 +2,9 @@ package test.lambda.openwhisk.actions;
 
 import com.google.gson.JsonObject;
 
+import test.lambda.utils.Convert;
+import test.lambda.utils.MissedParams;
+import test.lambda.utils.Result;
 import test.lambda.utils.Xml2Json;
 
 public final class LambdaXml2JsonOpenWhisk
@@ -14,8 +17,19 @@ public final class LambdaXml2JsonOpenWhisk
     String xml = null;
     String json = null;
     JsonObject result = null;
+    MissedParams missedParams = new MissedParams (); 
 
-    if ( args .has ( "id" ))
+    if ( args .has ( "id" )) id = args .get ( "id" ) .getAsString ();
+    else missedParams.add ( "id" );
+    if ( args .has ( "rev" )) rev = args .get ( "rev" ) .getAsString ();
+    else missedParams.add ( "rev" );
+    
+    if ( missedParams.hasMissedParameters () )
+         return  Result.failure ( "LambdaXml2JsonOpenWhisk - some parameters are missing: ( " + missedParams + " )" );
+
+System.out.println ( "Xml2Json id -> " + id);//!!
+System.out.println ( "Xml2Json rev -> " + rev);
+
     // Getting 'xml' parameter out of the call's input
     if ( ! args.has ( "xml" ) ) System.err.println ( "The 'xml' parameter missing!" );
     else

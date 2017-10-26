@@ -68,8 +68,9 @@ public final class CouchDB
     response = CallRestService.get (  makeUrl ( host, port, null, "/_uuids", login, password ) );
 //    response = Convert.jsonToMap ( CallRestService.get (  makeUrl ( host, port, null, "/_uuids", login, password ) ) );
     if ( Result.isFailed ( response ) ) return null;
-
-    JsonArray uuids = response .get ( "uuids" ) .getAsJsonArray ();
+System.out.println ( "uuids response -> " + response );//!!!
+    JsonArray uuids = Result.getValue ( response ) .get ( "uuids" ) .getAsJsonArray ();
+System.out.println ( "uuids = " + uuids );//!!!
 //    @SuppressWarnings ( "unchecked" )
 //    List < String > uuids = ( List < String > ) response.get ( "uuids" );
     if ( uuids == null )

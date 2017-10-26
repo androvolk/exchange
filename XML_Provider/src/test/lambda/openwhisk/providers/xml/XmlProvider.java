@@ -34,9 +34,13 @@ public final class XmlProvider
   private static final int HTTP_PORT = 8080;
 
   // Directory polling parameters
-  private static String dirToMonitor = "/tmp/lambda_demo";
+  private static String dirToMonitor ="/tmp/lambda_demo";
 //  private static String pollInterval = "5000";
   private static int pollInterval = 5000;
+  
+  // Authorization key parameters
+  private static String authKeyLogin = null;
+  private static String authKeyPassword = null;
   
   // CouchDB access parameters
   private static String dbHost = null; //"127.0.0.1";
@@ -130,49 +134,25 @@ System.out.println ( "#2 ");//!!!
       if ( params.has ( "dirToMonitor" ) )  dirToMonitor = params .get ( "dirToMonitor" ) .getAsString ();
       if ( params.has ( "pollInterval" ) )  pollInterval = params .get ( "pollInterval" ) .getAsInt ();
       
-System.out.println ( "#2-A ");//!!!
-      
       if ( params.has ( "dbHost" ) ) dbHost = params .get ( "dbHost" ) .getAsString ();
       else missedParams.add ( "dbHost" );
-System.out.println ( "#2-B ");//!!!
       if ( params.has ( "dbPort" ) ) dbPort = params .get ( "dbPort" ) .getAsInt ();
       else missedParams.add ( "dbPort" );
-System.out.println ( "#2-C ");//!!!
       if ( params.has ( "dbName" ) ) dbName = params .get ( "dbName" ) .getAsString ();
       else missedParams.add ( "dbName" );
-System.out.println ( "#2-D ");//!!!
       if ( params.has ( "dbLogin" ) )  dbLogin = params .get ( "dbLogin" ) .getAsString ();
       else missedParams.add ( "dbLogin" );
-System.out.println ( "#2-E ");//!!!
       if ( params.has ( "dbPassword" ) )  dbPassword = params .get ( "dbPassword" ) .getAsString ();
       else missedParams.add ( "dbPassword" );
-System.out.println ( "#3 ");//!!!
       
-//      // Set new parameters values arrived with call instead of default ones
-//      if ( params.containsKey ( "dirToMonitor" ) )  dirToMonitor = params.get ( "dirToMonitor" );
-//      if ( params.containsKey ( "pollInterval" ) )  pollInterval = params.get ( "pollInterval" );
-//
-//System.out.println ( "#2-A ");//!!!
-//
-//      if ( params.containsKey ( "dbHost" ) ) dbHost = params.get ( "dbHost" );
-//      else missedParams.add ( "dbHost" );
-//System.out.println ( "#2-B ");//!!!
-//      if ( params.containsKey ( "dbPort" ) ) dbPort = params.get ( "dbPort" );
-//      else missedParams.add ( "dbPort" );
-//System.out.println ( "#2-C ");//!!!
-//      if ( params.containsKey ( "dbName" ) ) dbName = params.get ( "dbName" );
-//      else missedParams.add ( "dbName" );
-//System.out.println ( "#2-D ");//!!!
-//      if ( params.containsKey ( "dbLogin" ) )  dbLogin = params.get ( "dbLogin" );
-//      else missedParams.add ( "dbLogin" );
-//System.out.println ( "#2-E ");//!!!
-//      if ( params.containsKey ( "dbPassword" ) )  dbPassword = params.get ( "dbPassword" );
-//      else missedParams.add ( "dbPassword" );
-//System.out.println ( "#3 ");//!!!
+System.out.println ( "#3 ");//!!!
 
       if ( missedParams.hasMissedParameters () )
+      {
+        res.status ( 500 );
         return Convert.jsonObjectToJson ( 
                   Result.failure ( "/config - some parameters are missing: ( " + missedParams + " )" ) );
+      }
 System.out.println ( "#4 ");//!!!
 
 System.out.println ("dirToMonitor -> " + dirToMonitor  ); //!!!    
@@ -189,11 +169,10 @@ System.out.println ( "#5 ");//!!!
       if ( ! ( new File ( dirToMonitor ) ) .exists () )
       {
         System.err.println ( "Directory '" + dirToMonitor + "' doesn't exist! Configuration failed!" );
-//        res.status ( 500 );//???
-//        return STATUS_ERROR;
+        res.status ( 500 );//???
         return Convert.jsonObjectToJson ( 
                   Result.failure ( "/config - Directory '" + dirToMonitor + 
-                        "' doesn't exist! Configuration failed! " ) );
+                                        "' doesn't exist! Configuration failed! " ) );
       }
 
 //      return STATUS_OK;
@@ -221,6 +200,7 @@ System.out.println ( "#7 ");//!!!
       catch ( Exception e ) 
       { 
 System.out.println ( "#8 ");//!!!
+        res.status ( 500 );//???
         String msg = e.getMessage ();
         System.err.println ( "/register_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg );
         return Convert.jsonObjectToJson (
@@ -230,19 +210,32 @@ System.out.println ( "#8 ");//!!!
       // Validate important parameters
       if ( params. has ( "triggerHost" ) )  triggerHost = params. get ( "triggerHost" ) .getAsString ();
       else missedParams.add ( "triggerHost" );
-      if ( params. has( "triggerName" ) )  triggerName = params .get ( "triggerName" ) .getAsString ();
+      if ( params. has( "triggerName" ) )
+      {
+        String fullTrigName = params .get ( "triggerName" ) .getAsString ();
+        int pos = fullTrigName.lastIndexOf ( '/' ); // OpenWhisk sends trigger name with namespace. Bad API design!
+        triggerName = fullTrigName.substring ( ++ pos );
+      }
       else missedParams.add ( "triggerName" );
-//      if ( params.containsKey ( "triggerHost" ) )  triggerHost = params.get ( "triggerHost" );
-//      else missedParams.add ( "triggerHost" );
-//      if ( params.containsKey ( "triggerName" ) )  triggerName = params.get ( "triggerName" );
-//      else missedParams.add ( "triggerName" );
+      if ( params. has( "authKey" ) )
+      {  
+        String authKey = params .get ( "authKey" ) .getAsString ();
+        int offset = authKey.indexOf ( ':' );
+        authKeyLogin = authKey.substring ( 0, offset );
+        authKeyPassword = authKey.substring ( ++ offset );
+System.out.println ( "authKeyLogin -> " + authKeyLogin );//!!!
+System.out.println ( "authKeyPassword -> " + authKeyPassword );//!!!
+      }
+      else missedParams.add ( "authKey" );
 
       if ( missedParams.hasMissedParameters () )
+      {
+        res.status ( 500 );
         return Convert.jsonObjectToJson (
                   Result.failure ( "/register_trigge - some parameters are missing: ( " + missedParams + " )" ) );
-
+      }
       // Construct valid trigger URL of request parameters
-      triggerUrl = "https://" + triggerHost + "/api/v1/namespaces/guest/triggers" + triggerName;
+      triggerUrl = "https://" + triggerHost + "/api/v1/namespaces/guest/triggers/" + triggerName;
      
 System.out.println ("triggerHost -> " + triggerHost  ); //!!!    
 System.out.println ("triggerName -> " + triggerName  ); //!!!    
@@ -304,6 +297,8 @@ System.out.println ( "triggerName matched" );//!!!
           triggerHost = null;
           triggerName = null;
           triggerUrl = null;
+          authKeyLogin = null;
+          authKeyPassword = null;
         }
 //        else { System.out.println ( params .get ( "triggerName" ) .getAsString () ); return Result.toJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) );}
         else { String json =  Convert.jsonObjectToJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) ) ; System.out.println ( "json -> " + json ); return json;  };
@@ -413,7 +408,7 @@ System.out.println ( "fireTrigger returned -> " + entries ); //!!!
 System.out.println ( "File found -> " + xmlToUpload.getCanonicalPath () ); //!!!
       
       response = CouchDB.createDocument ( 
-                dbHost, dbPort, dbName, dbLogin, dbPassword, null, "{\"current_processor\":\"XmlProvider\"}" );
+                dbHost, dbPort, dbName, dbLogin, dbPassword, null, "{\"last_processor\":\"XmlProvider\"}" );
  //     if ( response == null ) return Result.failure ( "DirPoller::uploadXmlToCouchDB - uploadXmlToCouchDB() returned null!" );
 //      jsonFields = Convert.jsonToMap ( response );
       
@@ -482,9 +477,10 @@ System.out.println ("CouchDB.createDocumentAttachment response -> " + response  
 //      return null;
 //    }
    
-    JsonObject response = CallRestService.put ( triggerUrl, 
-                          "{\"id\":\"" + params .get ( "id" ) .getAsString () + 
-                                  "\",\"rev\":\"" + params .get ( "rev" ) .getAsString () + "\"}" );
+    JsonObject response = CallRestService.post ( triggerUrl, authKeyLogin, authKeyPassword,
+//    JsonObject response = CallRestService.put ( triggerUrl, 
+                     "{\"id\":\"" + Result.getValue ( params ) .get ( "id" ) .getAsString () + 
+                           "\",\"rev\":\"" + Result.getValue ( params ) .get ( "rev" ) .getAsString () + "\"}" );
 //    String response = CallRestService.put ( triggerUrl, "{\n\t\"id\":\"" + 
 //                                              ( String ) params.get ( "id" ) + 
 //                                                  "\",\n\t\"rev\":\"" + ( String ) params.get ( "rev" ) + "\"\n}" );
