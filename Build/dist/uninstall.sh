@@ -3,7 +3,7 @@
 set -e
 set -x
 
-CLI = "wsk"
+CLI="wsk"
 
 echo "   Attention! You are going to delete XML Provider Feed Infrastructure!"
 read -p "Press Ctrl-C to cancel or enter to continue..."
@@ -22,7 +22,6 @@ echo -e "\n============  Deleting Java actions =================================
 $CLI action delete /guest/lambda_demo/xml2json
  
 echo -e "\n============  Deleting shared package for feeds and actions ======================\n"
-Delete shared package for feeds and actions
 $CLI package delete /guest/lambda_demo
 
 echo -e "\n============  Check result =======================================================\n"

@@ -3,7 +3,7 @@
 set -e
 set -x
 
-CLI = "wsk"
+CLI="wsk"
 
 echo "   Attention! Make sure that XML Provider process is already running!"
 echo "   If not, run './run_prov.sh' script, firstAttention!"
