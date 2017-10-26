@@ -17,18 +17,19 @@ public final class BasicAuthTest
   {
     String postBody = "{}";
     
-    Request request = new Request.Builder()
-      .url("https://192.168.33.13/api/v1/namespaces/guest/activations")
-      .addHeader("Authorization", Credentials.basic ("23bc46b1-71f6-4ed5-8c54-816aa4f8c502", "123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"))
-      .get()
-      .build();
+    Request request = new Request.Builder ()
+      .url ( "https://192.168.33.13/api/v1/namespaces/guest/activations" )
+      .addHeader ( "Authorization", Credentials.basic ( "23bc46b1-71f6-4ed5-8c54-816aa4f8c502", 
+                                  "123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP" ) )
+      .get ()
+      .build ();
  
-    Call call = new OkHttpClient ().newCall(request);
-    Response response = call.execute();
-    System.out.println ( "Headers -> " + response.headers ().toString () );
+    Call call = new OkHttpClient () .newCall ( request );
+    Response response = call.execute ();
+    System.out.println ( "Headers -> " + response.headers () .toString () );
     System.out.println ( "Code -> " + response.code () );
-    System.out.println ( "Successful -> " + response.isSuccessful ());
-    System.out.println ( response.body().string () );
+    System.out.println ( "Successful -> " + response.isSuccessful () );
+    System.out.println ( response .body () .string () );
   }
 
 }
