@@ -18,7 +18,7 @@ public final class ReadAttachmentTest
     String postBody = "{}";
     
     Request request = new Request.Builder ()
-      .url ( "https://192.168.33.13:5984/feed_files/" + args [ 0 ] + "/xml?rev=" + args [ 1 ] )
+      .url ( "http://192.168.33.13:5984/feed_files/" + args [ 0 ] + "/xml?rev=" + args [ 1 ] )
       .get ()
       .build ();
  
@@ -27,7 +27,7 @@ public final class ReadAttachmentTest
     System.out.println ( "Headers -> " + response.headers () .toString () );
     System.out.println ( "Code -> " + response.code () );
     System.out.println ( "Successful -> " + response.isSuccessful () );
-    System.out.println ( response .body () .string () );
+    System.out.println ( "|" + response .body () .string () + "|");
   }
 
 }

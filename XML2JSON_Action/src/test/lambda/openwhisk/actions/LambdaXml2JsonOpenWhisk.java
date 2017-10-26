@@ -30,17 +30,21 @@ public final class LambdaXml2JsonOpenWhisk
 System.out.println ( "Xml2Json id -> " + id);//!!
 System.out.println ( "Xml2Json rev -> " + rev);
 
-    // Getting 'xml' parameter out of the call's input
-    if ( ! args.has ( "xml" ) ) System.err.println ( "The 'xml' parameter missing!" );
-    else
-    {
-      xml = args .get ( "xml" ) .getAsString ();
-      if ( xml == null ) 
-      { 
-        System.err.println ( "Unable to extract 'xml' parameter or it is null!" );
-        return null; 
-      }
-    }
+    // Getting XML from CouchDB by it's id and revision
+
+
+
+//    // Getting 'xml' parameter out of the call's input
+//    if ( ! args.has ( "xml" ) ) System.err.println ( "The 'xml' parameter missing!" );
+//    else
+//    {
+//      xml = args .get ( "xml" ) .getAsString ();
+//      if ( xml == null ) 
+//      { 
+//        System.err.println ( "Unable to extract 'xml' parameter or it is null!" );
+//        return null; 
+//      }
+//    }
     
     // Passing the xml to the global converter
     json = Xml2Json.convertXml2Json ( xml );
