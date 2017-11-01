@@ -29,13 +29,10 @@ public final class XmlProvider
 {
   private static final Logger logger = LoggerFactory.getLogger ( XmlProvider.class );
 
-//  private static final String STATUS_OK = "{\n\t\"status\": \"success\"\n\t\"success\": \"true\"\n}";
-//  private static final String STATUS_ERROR = "{\n\t\"status\": \"failure\"\n\t\"success\": \"false\"\n}";
   private static final int HTTP_PORT = 8080;
 
   // Directory polling parameters
   private static String dirToMonitor ="/tmp/lambda_demo";
-//  private static String pollInterval = "5000";
   private static int pollInterval = 5000;
   
   // Authorization key parameters
@@ -45,13 +42,10 @@ public final class XmlProvider
   // CouchDB access parameters
   private static String dbHost = null; //"127.0.0.1";
   private static int dbPort; //5984;
-//  private static String dbPort = null; //5984;
   private static String dbName = null; //"feed_files";
   private static String dbLogin = null; //"lambda_demo";
   private static String dbPassword = null; //`123456";
   
-//  private static String pollIntervalParam = null;  //???
-
   // Trigger parameters
   private static String triggerHost = null; //"127.0.0.1";
   private static String triggerName = null;
@@ -114,21 +108,13 @@ System.out.println ( "zzz" );//!!!
 
 System.out.println ( "/config PUT payload  -> " + req.body () );//!!!
 
-//      Map < String, String > params = null;
-//      JsonObject params = ( new JsonParser () ) .parse( req.body () ) .getAsJsonObject (); //???
         params = Convert.jsonToJsonObject ( req.body () ); //???
-//      try { params = ( new Gson () .fromJson ( req.body (), HashMap.class ) ); }
-//      catch ( Exception e ) { /*System.out.println ( e.getMessage () );*/ res.body ( e.getMessage () );}
 
 System.out.println ( "#1 ");//!!!
 
       // Validate important parameters
       if ( params == null )
-//        return "{\n\t\"status\": \"failure\",\n\t\"success\": \"false\",\n\t" + 
-//                                  "\"msg\": \"/config call failed due to parameters!\"\n}";
-//            return Result.toJson ( Result.failure ( "/config call failed due to parameters!" ) );
         return ( Convert.jsonObjectToJson ( Result.failure ( "/config call failed due to parameters!" ) ) );
-//        return ( Result.toJson ( Result.failure ( "/config call failed due to parameters!" ) ) );
 System.out.println ( "#2 ");//!!!
 
       if ( params.has ( "dirToMonitor" ) )  dirToMonitor = params .get ( "dirToMonitor" ) .getAsString ();
@@ -175,7 +161,6 @@ System.out.println ( "#5 ");//!!!
                                         "' doesn't exist! Configuration failed! " ) );
       }
 
-//      return STATUS_OK;
       return Convert.jsonObjectToJson ( Result.success ( "/config - Confuguration succeeded" ) );
     } );
 
@@ -188,8 +173,6 @@ System.out.println ( "#5 ");//!!!
 
   System.out.println ( "/register_trigger PUT payload  -> " + req.body () );//!!!
 
-//      Map < String, String > params = null;
-//      try { params = ( new Gson () .fromJson ( req.body (), HashMap.class ) ); }
       try {
 System.out.println ( "#6 ");//!!!
 System.out.println ( "req.body() -> " + req.body () );//!!!
@@ -241,19 +224,14 @@ System.out.println ("triggerHost -> " + triggerHost  ); //!!!
 System.out.println ("triggerName -> " + triggerName  ); //!!!    
 System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!    
 
-//      try   //TODO: Remove after debugging! 
-//      {
         // Startup directory polling
         poller = new Thread ( new DirPoller (), "XML-Provider-Dir-Poller" );
-
-//      } catch (Exception e) { System.err.println ( e.getMessage () ); } //TODO: Remove after debugging!
 
       // Set busy flag and start the polling thread
       isOn = true;
       poller.start ();
       
       // Operation succeeded
-//      return STATUS_OK;
       return Convert.jsonObjectToJson ( Result.success ( "/register_trigger - Trigger established" ) );
     } );
     
@@ -265,8 +243,6 @@ System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!
       
   System.out.println ( "/unregister_trigger PUT payload  -> " + req.body () );//!!!
 
-//      Map < String, String > params = null;
-//      try { params = ( new Gson () .fromJson ( req.body (), HashMap.class ) ); }
       try { params = Convert.jsonToJsonObject ( req.body () ); }//???
       catch ( Exception e ) 
       { 
@@ -282,12 +258,10 @@ System.out.println ( "jsonToJsonObject is OK" );//!!!
 System.out.println ( "params -> " + params ); //!!!
 
       
-//      if ( params.containsKey ( "triggerName" ) )
       if ( params. has ( "triggerName" ) )
       {
 System.out.println ( "params. has ( \"triggerName\" ) " );//!!!
 System.out.println ( "triggerName -> " + triggerName );//!!!
-//        if ( params .get ( "triggerName" ) .equals ( triggerName ) )
 System.out.println ( triggerName != null ? triggerName : "null????" );
         if ( triggerName != null && params .get ( "triggerName" ) .getAsString () .equals ( triggerName ) )
         {
@@ -300,7 +274,6 @@ System.out.println ( "triggerName matched" );//!!!
           authKeyLogin = null;
           authKeyPassword = null;
         }
-//        else { System.out.println ( params .get ( "triggerName" ) .getAsString () ); return Result.toJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) );}
         else { String json =  Convert.jsonObjectToJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) ) ; System.out.println ( "json -> " + json ); return json;  };
 System.out.println ( "params. has ( \"triggerName\" ) - out" );//!!!
 
@@ -382,7 +355,6 @@ System.out.println ( "fireTrigger returned -> " + entries ); //!!!
 
           // Short pause before next attempt to find the file
           Thread.sleep ( pollInterval );
-//          Thread.sleep ( Integer.parseInt ( pollInterval ) );
         }
       } 
       catch ( InterruptedException | IOException | NoSuchAlgorithmException  e )
@@ -396,25 +368,16 @@ System.out.println ( "fireTrigger returned -> " + entries ); //!!!
      * @throws NoSuchAlgorithmException
      */
     private JsonObject uploadXmlToCouchDB ( final File xmlToUpload) throws IOException, NoSuchAlgorithmException
-//    private Map uploadXmlToCouchDB ( final File xmlToUpload) throws IOException, NoSuchAlgorithmException
     {
       JsonObject value = null;
-//      Map jsonFields = null;
       JsonObject response = null;
-//      String response = null;
-      
-//      isBusy = true; //???
       
 System.out.println ( "File found -> " + xmlToUpload.getCanonicalPath () ); //!!!
       
       response = CouchDB.createDocument ( 
                 dbHost, dbPort, dbName, dbLogin, dbPassword, null, "{\"last_processor\":\"XmlProvider\"}" );
- //     if ( response == null ) return Result.failure ( "DirPoller::uploadXmlToCouchDB - uploadXmlToCouchDB() returned null!" );
-//      jsonFields = Convert.jsonToMap ( response );
       
 System.out.println ("CouchDB.createDocument response -> " + response  ); //!!!
-//System.out.println ("Map keys -> " + jsonFields.keySet () .toString ()  ); //!!!
-//System.out.println ("Map values -> " + jsonFields.values () .toString ()  ); //!!!
       
       if ( Result.isFailed ( response ) )
       //if ( Result.isFailed ( result ) )
@@ -428,20 +391,16 @@ System.out.println ("CouchDB.createDocument response -> " + response  ); //!!!
 
       String id = value .get ( "id" ) .getAsString ();
       String rev = value .get ( "rev" ) .getAsString ();
-//      String id = ( String ) jsonFields.get ( "id" );
-//      String rev = ( String ) jsonFields.get ( "rev" );
       
 System.out.println ("_id -> " + id  ); //!!!
 System.out.println ("_rev -> " + rev  ); //!!!
       
-      response = CouchDB.uploadAttachment ( dbHost, dbPort, dbName, dbLogin, dbPassword,
-                                      id, rev, "xml", xmlToUpload.getCanonicalPath (), "application/xml" );
-//      jsonFields = CallRestService.jsonToMap ( response );
+      response = CouchDB.uploadXmlAttachment ( dbHost, dbPort, dbName, dbLogin, dbPassword,
+                                                        id, rev, "XML", xmlToUpload.getCanonicalPath () );
 
 System.out.println ("CouchDB.createDocumentAttachment response -> " + response  ); //!!!
 
       if ( Result.isFailed ( response ) )
-      //if ( Result.isFailed ( result ) )
       {
         String msg = "DirPoller::uploadXmlToCouchDB failed to upload attachment! REST returned: " + 
                                                       Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
@@ -453,11 +412,6 @@ System.out.println ("CouchDB.createDocumentAttachment response -> " + response  
         xmlToUpload.delete ();
         return response;
       }
-
-//      xmlToUpload.delete ();
-//      isBusy = false; //???
-      
-//      return  Convert.jsonToMap ( response );
     }
   }
 
@@ -468,22 +422,11 @@ System.out.println ("CouchDB.createDocumentAttachment response -> " + response  
    * @throws IOException 
    */
   private static JsonObject fireTrigger ( final JsonObject params ) throws IOException
-//  private static Map fireTrigger ( final Map params ) throws IOException
   {
-//    if ( params == null || ! params.hasKey ( "id" ) || ! params.has ( "rev" ) )
-//    {
-//System.err.println ( params ); //!!!
-//      System.err.println ( "Feed::fireTrigger received bad 'params'!" );
-//      return null;
-//    }
-   
     JsonObject response = CallRestService.post ( triggerUrl, authKeyLogin, authKeyPassword,
-//    JsonObject response = CallRestService.put ( triggerUrl, 
                      "{\"id\":\"" + Result.getValue ( params ) .get ( "id" ) .getAsString () + 
                            "\",\"rev\":\"" + Result.getValue ( params ) .get ( "rev" ) .getAsString () + "\"}" );
-//    String response = CallRestService.put ( triggerUrl, "{\n\t\"id\":\"" + 
-//                                              ( String ) params.get ( "id" ) + 
-//                                                  "\",\n\t\"rev\":\"" + ( String ) params.get ( "rev" ) + "\"\n}" );
+
 System.out.println ("CallRestService.put response -> " + response  ); //!!!
 
     if ( Result.isFailed ( response ) )
@@ -494,8 +437,6 @@ System.out.println ("CallRestService.put response -> " + response  ); //!!!
       return Result.failure ( msg );
     }
     else return response;
-
-//    return Convert.jsonToMap ( response );
   }
 
 }

@@ -61,10 +61,9 @@ System.out.println ( "LambdaXmlFeedOpenWhisk::main::lifecycleEvent.equals ( \"CR
     }
     catch ( IOException e )
     {
-      System.err.println ( "Feed generated IOException! Reason: " + e.getMessage () );
-//      result = failureWithMessage ( e.getMessage () );
-      result = Result.failure (
-                  "LambdaXmlFeedOpenWhisk::main - Feed generated IOException! Reason: " + e.getMessage () );
+      String msg = "Feed generated IOException! Reason: " + e.getMessage ();
+      System.err.println ( msg );
+      result = Result.failure ( msg );
     }
 
     return result;

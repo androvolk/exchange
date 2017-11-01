@@ -15,11 +15,6 @@ import com.google.gson.JsonObject;
 
 public final class CouchDB
 {
-//  private final static String HOST = "127.0.0.1";
-//  private final static String PORT = "5984";
-//  private final static String DB = "feed_files";
-//  private final static String LOGIN = "lambda_demo";
-//  private final static String PASSWORD = "123456";
   
   /**
    * Generate URL for calling CouchDB REST API
@@ -32,10 +27,8 @@ public final class CouchDB
    * @return Valid URL to call the API
    */
   public static String makeUrl ( final String host, final int port, final String dataBase, 
-//  public static String makeUrl ( final String host, final String port, final String dataBase, 
                                             final String resource, final String login, final String password )
   {
-//    String result = null;
     String prefix = "";
     String infix = "";
     
@@ -43,8 +36,6 @@ public final class CouchDB
     if ( dataBase != null) infix = "/" + dataBase;
     
     return "http://" + prefix + host + ":" + port + infix + resource; 
-
-//    return result;
   }
 
 
@@ -58,21 +49,15 @@ public final class CouchDB
    * @throws IOException
    */
   public static String getUuid ( final String host, final int port, final String login, final String password )
-//  public static String getUuid ( final String host, final String port, final String login, final String password )
                                                                                                       throws IOException
   {
     JsonObject response = null;
-//    @SuppressWarnings ( "rawtypes" )
-//    Map response = null;
     
     response = CallRestService.get (  makeUrl ( host, port, null, "/_uuids", login, password ) );
-//    response = Convert.jsonToMap ( CallRestService.get (  makeUrl ( host, port, null, "/_uuids", login, password ) ) );
     if ( Result.isFailed ( response ) ) return null;
 System.out.println ( "uuids response -> " + response );//!!!
     JsonArray uuids = Result.getValue ( response ) .get ( "uuids" ) .getAsJsonArray ();
 System.out.println ( "uuids = " + uuids );//!!!
-//    @SuppressWarnings ( "unchecked" )
-//    List < String > uuids = ( List < String > ) response.get ( "uuids" );
     if ( uuids == null )
     {
       System.err.println ( "CouchDB::getUuid failed to provide the UUID! REST returned: " + Result.getValue ( response ) );
@@ -80,7 +65,6 @@ System.out.println ( "uuids = " + uuids );//!!!
     }
 
     return uuids. get ( 0 ) .getAsString ();
-//    return uuids.get ( 0 );
   }
 
 
@@ -97,14 +81,10 @@ System.out.println ( "uuids = " + uuids );//!!!
    * @throws IOException
    */
   public static JsonObject createDocument (  final String host, final int port, final String dataBase,
-//  public static String createDocument (  final String host, final String port, final String dataBase,
                                          final String login, final String password, final String id, final String jsonDocument )
                                                                                                              throws IOException
   {
-//    JsonObject result = null;
-//    String result = null;
     JsonObject response = null;
-//    String response = null;
     String uuid = null;
     
     if ( id == null )
@@ -116,13 +96,9 @@ System.out.println ( "uuids = " + uuids );//!!!
     
     
     response = CallRestService.put ( makeUrl ( 
-//      return CallRestService.put ( makeUrl ( 
                     host, port, dataBase, "/" + ( id != null ? id : uuid ) , login, password ), jsonDocument );
 
-//    result = Convert.jsonToJsonObject ( response );
-    
     if ( Result.isFailed ( response ) )
-//    if ( Result.isFailed ( result ) )
     {
       String msg = "CouchDB::createDocument failed to create new document! REST returned: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
@@ -134,7 +110,7 @@ System.out.println ( "uuids = " + uuids );//!!!
 
   
   /**
-   * Asks CouchDB to attach file to existing document with particular ID and revision. 
+   * Asks CouchDB to attach XML file to existing document with particular ID and revision. 
    * @param host
    * @param port
    * @param dataBase
@@ -144,39 +120,33 @@ System.out.println ( "uuids = " + uuids );//!!!
    * @param docRevision
    * @param fileResouceName
    * @param fullPathToFile
-   * @param mimeType
    * @return
    * @throws IOException
    * @throws NoSuchAlgorithmException
    */
-  public static JsonObject uploadAttachment ( final String host, final int port, final String dataBase,
-//  public static String uploadAttachment ( final String host, final String port, final String dataBase,
+  public static JsonObject uploadXmlAttachment ( final String host, final int port, final String dataBase,
                                          final String login, final String password, final String id, final String docRevision,
-                                         final String fileResouceName, final String fullPathToFile, final String mimeType )
+                                         final String fileResouceName, final String fullPathToFile )
                                                                                    throws IOException, NoSuchAlgorithmException
   {
-//    String result = null;
     JsonObject response = null;
 
-    response = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
-//    return CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
-                                                          docRevision, fileResouceName, fullPathToFile, mimeType );
+    response = CallRestService.putWithXmlFile ( makeUrl ( 
+                                                      host, port, dataBase, "/" + id , login, password ),
+                                                                docRevision, fileResouceName, fullPathToFile );
     if ( Result.isFailed ( response ) )
-//    if ( result == null )
     {
-      String msg = "CouchDB::uploadAttachment failed to add attachment! REST returned: " + 
+      String msg = "CouchDB::uploadXmlAttachment failed to add attachment! REST returned: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
       System.err.println ( msg );
       return Result.failure ( msg );
     }
     else return response;
-
-//    return result;
   }
- 
-  
+
+
   /**
-   * 
+   * Asks CouchDB to attach JSON to existing document with particular ID and revision. 
    * @param host
    * @param port
    * @param dataBase
@@ -184,25 +154,60 @@ System.out.println ( "uuids = " + uuids );//!!!
    * @param password
    * @param id
    * @param docRevision
-   * @param fileResouceName
-   * @param fullPathToFile
-   * @param mimeType
+   * @param jsonResouceName
+   * @param jsonAttachment
    * @return
    * @throws IOException
    * @throws NoSuchAlgorithmException
    */
-  public static JsonObject downloadAttachment ( final String host, final int port, final String dataBase,
-                                           final String login, final String password, final String id, final String docRevision,
-                                           final String fileResouceName, final String fullPathToFile, final String mimeType )
-                                                                                     throws IOException, NoSuchAlgorithmException
+  public static JsonObject uploadJsonAttachment ( final String host, final int port, final String dataBase,
+                                         final String login, final String password, final String id, final String docRevision,
+                                                     final String jsonResouceName, final String jsonAttachment )
+                                                                                   throws IOException, NoSuchAlgorithmException
+  {
+    JsonObject response = null;
+
+    response = CallRestService.putWithJsonAttachment ( makeUrl ( 
+                                                      host, port, dataBase, "/" + id , login, password ),
+                                                                docRevision, jsonResouceName, jsonAttachment );
+    if ( Result.isFailed ( response ) )
+    {
+      String msg = "CouchDB::uploadJsonAttachment failed to add attachment! REST returned: " + 
+                                                    Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
+      System.err.println ( msg );
+      return Result.failure ( msg );
+    }
+    else return response;
+  }
+
+
+  /**
+   * Asks CouchDB to download attachment to existing document with particular ID and revision.
+   * @param host
+   * @param port
+   * @param dataBase
+   * @param login
+   * @param password
+   * @param id
+   * @param docRevision
+   * @param attachmentResouceName
+   * @return
+   * @throws IOException
+   * @throws NoSuchAlgorithmException
+   */
+  public static JsonObject downloadXmlAttachment ( final String host, final int port, final String dataBase,
+                                                     final String login, final String password, final String id,
+                                                     final String docRevision, final String attachmentResouceName )
+                                                                                  throws IOException, NoSuchAlgorithmException
     {
       JsonObject response = null;
 
-      response = CallRestService.putWithFile ( makeUrl ( host, port, dataBase, "/" + id , login, password ),
-                                                            docRevision, fileResouceName, fullPathToFile, mimeType );
+      response = CallRestService.getWithAttachment ( makeUrl ( 
+                      host, port, dataBase, "/" + id , login, password ), docRevision, attachmentResouceName );
+      
       if ( Result.isFailed ( response ) )
       {
-        String msg = "CouchDB::downloadAttachment failed to get attachment! REST returned: " + 
+        String msg = "CouchDB::downloadXmlAttachment failed to get attachment! REST returned: " + 
                                                       Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
         System.err.println ( msg );
         return Result.failure ( msg );
