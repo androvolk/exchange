@@ -231,49 +231,38 @@ System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
    */
   private static JsonObject decodeResponse ( final Response response, boolean isPlain ) throws IOException
   {
-    String body = null; //???
+    String body = null;
     JsonObject result = null;
     JsonObject value = null;
     
 System.out.println ( "Inside the CallRestService::decodeResponse" );//!!!
 System.out.println ( "response code -> " + response.code () );//!!!
      
+    // Result processing depends on whether it is plain text or JSON
+    if ( isPlain == true )
+    {
+      value = new JsonObject ();
+      String xml = new String ( response .body () .bytes () ); //???
+System.out.println ( "XML out of bytes -> "  + xml ); //!!!
+      value.addProperty ( "value",  xml );
+      //        value.addProperty ( "value",  response .body () .string () );
+    }
+    else
+    {
+      body = response .body () .string ();
+      value = Convert.jsonToJsonObject ( body );
+    }
+    
+    // Code result depending on success or failure
     if ( response.isSuccessful () )
     {
 System.out.println ( "CallRestService::decodeResponse - success" );//!!!
-      if ( isPlain == true )
-      {
-        value = new JsonObject ();
-        String xml = new String ( response .body () .bytes () ); //???
-System.out.println ( "XML out of bytes -> "  + xml ); //!!!
-        value.addProperty ( "value",  xml );
-        //        value.addProperty ( "value",  response .body () .string () );
-      }
-      else
-      {
-        body = response .body () .string ();
-        value = Convert.jsonToJsonObject ( body );
-      }
-
 System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
       result = Result.success ( value );
     }
     else
     {
 System.err.println ( "CallRestService::decodeResponse - failure" );//!!!
-      if ( isPlain == true )
-      {
-        value = new JsonObject ();
-        String xml = new String ( response .body () .bytes () ); //???
-System.out.println ( "XML out of bytes -> "  + xml ); //!!!
-        value.addProperty ( "value",  xml );
-        //        value.addProperty ( "value",  response .body () .string () );
-      }
-      else
-      {
-        body = response .body () .string ();
-        value = Convert.jsonToJsonObject ( body );
-      }
 System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
       result = Result.failure ( value );
     }
@@ -294,22 +283,39 @@ System.out.println ( "Leaving the CallRestService::decodeResponse" );//!!!
 //    if ( response.isSuccessful () )
 //    {
 //System.out.println ( "CallRestService::decodeResponse - success" );//!!!
-//      if ( isPlain == true ) body = "{\"value\":\"" + response .body () .string () + "\"}";
-//      else body = response .body () .string ();
+//      if ( isPlain == true )
+//      {
+//        value = new JsonObject ();
+//        String xml = new String ( response .body () .bytes () ); //???
+//System.out.println ( "XML out of bytes -> "  + xml ); //!!!
+//        value.addProperty ( "value",  xml );
+//        //        value.addProperty ( "value",  response .body () .string () );
+//      }
+//      else
+//      {
+//        body = response .body () .string ();
+//        value = Convert.jsonToJsonObject ( body );
+//      }
 //
-//      value = Convert.jsonToJsonObject ( body );
-////      value = Convert.jsonToJsonObject ( response .body () .string () );
 //System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
 //      result = Result.success ( value );
 //    }
 //    else
 //    {
 //System.err.println ( "CallRestService::decodeResponse - failure" );//!!!
-//      if ( isPlain == true ) body = "{\"value\":\"" + response .body () .string () + "\"}";
-//      else body = response .body () .string ();
-//
-//      value = Convert.jsonToJsonObject ( body );
-////      value = Convert.jsonToJsonObject ( response .body () .string () );
+//      if ( isPlain == true )
+//      {
+//        value = new JsonObject ();
+//        String xml = new String ( response .body () .bytes () ); //???
+//System.out.println ( "XML out of bytes -> "  + xml ); //!!!
+//        value.addProperty ( "value",  xml );
+//        //        value.addProperty ( "value",  response .body () .string () );
+//      }
+//      else
+//      {
+//        body = response .body () .string ();
+//        value = Convert.jsonToJsonObject ( body );
+//      }
 //System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
 //      result = Result.failure ( value );
 //    }
@@ -318,5 +324,6 @@ System.out.println ( "Leaving the CallRestService::decodeResponse" );//!!!
 //    
 //    return result;
 //  }
+
 
 }

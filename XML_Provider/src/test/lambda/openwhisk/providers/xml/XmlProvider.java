@@ -27,7 +27,7 @@ import test.lambda.utils.Result;
 
 public final class XmlProvider
 {
-  private static final Logger logger = LoggerFactory.getLogger ( XmlProvider.class );
+  private static final Logger log = LoggerFactory.getLogger ( XmlProvider.class );
 
   private static final int HTTP_PORT = 8080;
 
@@ -40,14 +40,14 @@ public final class XmlProvider
   private static String authKeyPassword = null;
   
   // CouchDB access parameters
-  private static String dbHost = null; //"127.0.0.1";
-  private static int dbPort; //5984;
-  private static String dbName = null; //"feed_files";
-  private static String dbLogin = null; //"lambda_demo";
-  private static String dbPassword = null; //`123456";
+  private static String dbHost = null;
+  private static int dbPort;
+  private static String dbName = null;
+  private static String dbLogin = null;
+  private static String dbPassword = null;
   
   // Trigger parameters
-  private static String triggerHost = null; //"127.0.0.1";
+  private static String triggerHost = null;
   private static String triggerName = null;
   private static String triggerUrl = null;
 
@@ -64,12 +64,12 @@ public final class XmlProvider
   
   public static void main ( String [] args ) throws RuntimeException
   {
-    // Configuring SLF4J logging facility
-    logger.trace("TRACE");
-    logger.info("INFO");
-    logger.debug("DEBUG");
-    logger.warn("WARN");
-    logger.error("ERROR");
+//    // Configuring SLF4J logging facility
+//    log.trace("TRACE");
+//    log.info("INFO");
+//    log.debug("DEBUG");
+//    log.warn("WARN");
+//    log.error("ERROR");
     
     // Starting provider itself
     new XmlProvider ();
@@ -84,19 +84,19 @@ public final class XmlProvider
     System.out.println ( "  *                                                                                         *" );
     System.out.println ( "  *******************************************************************************************\n\n" );
 
- System.out.println ( "xxx" ); //!!!   
+// System.out.println ( "xxx" ); //!!!   
 // ---------------------- /hello - Simple ping to be sure that provider is alive  ----------------------------------
     
     // Simple Ping method to see that provider is Ok
     get ( "/hello", ( req, res ) -> "Hello World" );
-System.out.println ( "yyy" );//!!!
+//System.out.println ( "yyy" );//!!!
 
     
 // ---------------------- /quit - Shutting down the provider ---------------------------------------------------------
     
     // Shut down the provider
     post ( "/quit", ( req, res ) -> { isOn = false; stop (); return "Service Stopped!"; } );
-System.out.println ( "zzz" );//!!!
+//System.out.println ( "zzz" );//!!!
 
     
 // ---------------------- /config - Configuring provider -------------------------------------------------------
@@ -107,6 +107,7 @@ System.out.println ( "zzz" );//!!!
       MissedParams missedParams = new MissedParams ();
 
 System.out.println ( "/config PUT payload  -> " + req.body () );//!!!
+        log.debug ( "/config PUT payload  -> " + req.body () );
 
         params = Convert.jsonToJsonObject ( req.body () ); //???
 
