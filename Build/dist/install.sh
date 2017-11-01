@@ -6,7 +6,7 @@
 CLI="wsk"
 
 echo "   Attention! Make sure that XML Provider process is already running!"
-echo "   If not, run './run_prov.sh' script, firstAttention!"
+echo "   If not, run './run_prov.sh' script, first"
 read -p "Press enter to continue..."
 
 echo -e "\n============  Creating shared package for actions and feeds ======================\n"
