@@ -6,7 +6,7 @@
     </encoder>
   </appender>
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file> /tmp/${byDay}.log </file>
+    <file> /tmp/Xml.Provider.OpenWhisk.Lambda.Demo${byDay}.log </file>
     <append>true</append>
     <encoder>
       <pattern>%-4relative %-5level %logger{35} - %msg%n</pattern>
