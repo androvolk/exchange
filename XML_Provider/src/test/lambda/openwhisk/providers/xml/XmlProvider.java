@@ -84,19 +84,16 @@ public final class XmlProvider
     System.out.println ( "  *                                                                                         *" );
     System.out.println ( "  *******************************************************************************************\n\n" );
 
-// System.out.println ( "xxx" ); //!!!   
 // ---------------------- /hello - Simple ping to be sure that provider is alive  ----------------------------------
     
     // Simple Ping method to see that provider is Ok
     get ( "/hello", ( req, res ) -> "Hello World" );
-//System.out.println ( "yyy" );//!!!
 
     
 // ---------------------- /quit - Shutting down the provider ---------------------------------------------------------
     
     // Shut down the provider
     post ( "/quit", ( req, res ) -> { isOn = false; stop (); return "Service Stopped!"; } );
-//System.out.println ( "zzz" );//!!!
 
     
 // ---------------------- /config - Configuring provider -------------------------------------------------------
@@ -106,10 +103,9 @@ public final class XmlProvider
     {
       MissedParams missedParams = new MissedParams ();
 
-System.out.println ( "/config PUT payload  -> " + req.body () );//!!!
-        log.debug ( "/config PUT payload  -> " + req.body () );
+      log.info ( "/config PUT payload - " + req.body () );
 
-        params = Convert.jsonToJsonObject ( req.body () ); //???
+      params = Convert.jsonToJsonObject ( req.body () ); //???
 
 System.out.println ( "#1 ");//!!!
 
