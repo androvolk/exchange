@@ -5,10 +5,8 @@ import java.io.IOException;
 
 import com.google.gson.JsonObject;
 
-import okhttp3.Call;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -271,6 +269,8 @@ System.out.println ( "Leaving the CallRestService::decodeResponse" );//!!!
     
     return result;
   }
+
+
 //  private static JsonObject decodeResponse ( final Response response, boolean isPlain ) throws IOException
 //  {
 //    String body = null; //???
