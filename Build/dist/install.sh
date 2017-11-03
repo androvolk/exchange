@@ -23,7 +23,7 @@ echo -e "\n============ Registering feed action ================================
 $CLI action update lambda_demo/xml_feed xml2json.jar  --main test.lambda.openwhisk.feeds.LambdaXmlFeedOpenWhisk -p xmlProvHost "127.0.0.1" -p xmlProvPort 8080 -p triggerHost "192.168.33.13"  -a feed true -a description "Feed Action Controlling XML Provider's Live Cycle" -a parameters '[{"name":"xmlProvHost","required":"false", "description":"XML feed provider host name or IP address"}, {"name":"xmlProvPort","required":"false", "description":"Port number which is listened to by XML feed provider"}, {"name":"triggerHost","required":"false", "description":"OpenWhisk environment where the trigger is hosted"}]'
  
 echo -e "\n============ Creating trigger ===================================================\n"
-$CLI trigger update new_xml_file_trigger --feed  lambda_demo/xml_feed -p xmlProvHost 192.168.33.13
+$CLI trigger create new_xml_file_trigger --feed  lambda_demo/xml_feed -p xmlProvHost 192.168.33.13
  
 echo -e "\n============ Creating rule =======================================================\n"
 $CLI rule update new_xml_file_ruler new_xml_file_trigger lambda_demo/process_xml
