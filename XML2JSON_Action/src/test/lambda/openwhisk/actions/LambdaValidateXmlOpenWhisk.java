@@ -66,8 +66,8 @@ public class LambdaValidateXmlOpenWhisk
       return  Result.failure ( msg );
     }
     
-    log.debug ( String.format ( "LambdaValidateXmlOpenWhisk parameters: [ id = %s, rev = %s, dbHost = %s, " + 
-                                "dbPort = %d, dbName = %s, dbLogin = %s, dbPassword = %s, xmlSchemaFile = %s ]",
+    log.debug ( String.format ( "LambdaValidateXmlOpenWhisk parameters: { id = %s, rev = %s, dbHost = %s, " + 
+                                "dbPort = %d, dbName = %s, dbLogin = %s, dbPassword = %s, xmlSchemaFile = %s }",
                                 id, rev, dbHost, dbPort, dbName, dbLogin, dbPassword, xmlSchemaFile ) );
 
     // Getting XML from CouchDB by it's id and revision
