@@ -19,7 +19,7 @@ echo -e "\n============ Deleting feed action ===================================
 $CLI action delete /guest/lambda_demo/xml_feed
  
 echo -e "\n============ Delete action sequence =============================================\n"
-$CLI action delete /guest/lambda_demo/xml2json
+$CLI action delete /guest/lambda_demo/process_xml
 
 echo -e "\n============ Deleting Java actions ==============================================\n"
 $CLI action delete /guest/lambda_demo/xml2json
