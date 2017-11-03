@@ -35,6 +35,7 @@ public class LambdaValidateXmlOpenWhisk
 
     MissedParams missedParams = new MissedParams (); 
 
+    log.info ( "XML validation started" );
     log.debug ( "args = " + args );
     
     if ( args .has ( "id" )) id = args .get ( "id" ) .getAsString ();
@@ -60,12 +61,14 @@ public class LambdaValidateXmlOpenWhisk
     if ( missedParams.hasMissedParameters () )
     {
       String msg = "LambdaValidateXmlOpenWhisk - some parameters are missing: ( " + missedParams + " )"; 
+      log.info ( "XML validation failed" );
       log.error ( "args = " + args );
       return  Result.failure ( msg );
     }
-
-System.out.println ( "Xml2Json id -> " + id);//!!
-System.out.println ( "Xml2Json rev -> " + rev);
+    
+    log.debug ( String.format ( "LambdaValidateXmlOpenWhisk parameters: [ id = %s, rev = %s, dbHost = %s, " + 
+                                "dbPort = %d, dbName = %s, dbLogin = %s, dbPassword = %s, xmlSchemaFile = %s ]",
+                                id, rev, dbHost, dbPort, dbName, dbLogin, dbPassword, xmlSchemaFile ) );
 
     // Getting XML from CouchDB by it's id and revision
     try
@@ -76,6 +79,7 @@ System.out.println ( "Xml2Json rev -> " + rev);
     catch ( NoSuchAlgorithmException | IOException e )
     {
       String msg = "CouchDB::downloadXmlAttachment generated exception! Reason: " + e.getMessage ();
+      log.info ( "XML validation failed" );
       log.error ( msg );
       return Result.failure ( msg );
     }
@@ -84,6 +88,7 @@ System.out.println ( "Xml2Json rev -> " + rev);
     {
       String msg = "CouchDB::downloadXmlAttachment failed to download XML attachment! Reason: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
+      log.info ( "XML validation failed" );
       log.error ( msg );
       return Result.failure ( msg );
     }
@@ -96,6 +101,7 @@ System.out.println ( "Xml2Json rev -> " + rev);
     if ( xml == null )
     {
       String msg = "CouchDB::downloadXmlAttachment returned response with null as value!"; 
+      log.info ( "XML validation failed" );
       log.error ( msg );
       return Result.failure ( msg );
     }
@@ -104,10 +110,12 @@ System.out.println ( "Xml2Json rev -> " + rev);
     if ( ! XmlValidator.isXmlValid ( xml, xmlSchemaFile ) )
     {
       String msg = "XmlValidator::isXmlValid failed to validate XML!"; 
+      log.info ( "XML validation failed" );
       log.error ( msg );
       return Result.failure ( msg );
     }
     
+    log.info ( "XML validation was successful" );
     return Convert.jsonToJsonObject ( "{\"id\":\"" + id + ",\"rev\":\"" + rev + "\"}" );
   }
 
