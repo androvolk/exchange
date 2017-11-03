@@ -3,6 +3,9 @@ package test.lambda.openwhisk.actions;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.JsonObject;
 
 import test.lambda.utils.Convert;
@@ -13,6 +16,7 @@ import test.lambda.utils.Xml2Json;
 
 public final class LambdaXml2JsonOpenWhisk
 {
+  private static final Logger log = LoggerFactory.getLogger ( LambdaXml2JsonOpenWhisk.class );
 
   public static JsonObject main ( JsonObject args )
   {

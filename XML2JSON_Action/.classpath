@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gson"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Utils"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/sl4j"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
