@@ -64,12 +64,6 @@ public final class XmlProvider
   
   public static void main ( String [] args ) throws RuntimeException
   {
-//    // Configuring SLF4J logging facility
-//    log.trace("TRACE");
-//    log.info("INFO");
-//    log.debug("DEBUG");
-//    log.warn("WARN");
-//    log.error("ERROR");
     
     // Starting provider itself
     new XmlProvider ();
@@ -78,11 +72,11 @@ public final class XmlProvider
     port ( HTTP_PORT );
     
     // Let's show that we're alive
-    System.out.println ( "\n\n  *******************************************************************************************" );
-    System.out.println ( "  *                                                                                         *" );
-    System.out.println ( "  *             Lambda Demo OpenWhisk XML Documents Provider    (c) 2017                    *" );
-    System.out.println ( "  *                                                                                         *" );
-    System.out.println ( "  *******************************************************************************************\n\n" );
+    log.info ( "\n\n  *******************************************************************************************" );
+    log.info ( "  *                                                                                         *" );
+    log.info ( "  *             Lambda Demo OpenWhisk XML Documents Provider    (c) 2017                    *" );
+    log.info ( "  *                                                                                         *" );
+    log.info ( "  *******************************************************************************************\n\n" );
 
 // ---------------------- /hello - Simple ping to be sure that provider is alive  ----------------------------------
     

@@ -15,6 +15,10 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.Okio;
+
 public class XmlValidationTest
 {
 
@@ -23,14 +27,25 @@ public class XmlValidationTest
     try
     {
       SchemaFactory factory = SchemaFactory.newInstance ( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+System.out.println ( "#1" );
       Schema schema = factory.newSchema ( new File ( args [ 0 ] ) );
+System.out.println ( "#2" );
       Validator validator = schema.newValidator ();
+System.out.println ( "#3" );
       XMLInputFactory xmlFactory = XMLInputFactory.newFactory ();
-      XMLEventReader reader = xmlFactory.createXMLEventReader ( new StringReader ( args [ 1 ] ) );
+System.out.println ( "#4" );
+      //new File (args [1]) .
+      
+      BufferedSource bufferedSource = Okio.buffer ( Okio.source ( new File ( args [1] ) ) );
+      
+      XMLEventReader reader = xmlFactory.createXMLEventReader ( new StringReader ( bufferedSource.readUtf8 () ) );
+System.out.println ( "#5" );
       validator.validate ( new StAXSource ( reader ) );
+System.out.println ( "#6" );
     }
     catch ( SAXException | IOException | XMLStreamException e )
     {
+System.err.println ( e.getMessage () );
       e.printStackTrace ();
     }
     
