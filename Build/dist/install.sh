@@ -13,7 +13,7 @@ echo -e "\n============ Creating shared package for actions and feeds ==========
 $CLI package update lambda_demo --shared yes -p dbHost "192.168.33.13" -p dbPort 5984 -p dbName feed_files -p dbLogin lambda_demo -p dbPassword "~123456" -a description "OpenWhisk Demo Showing How To Implement Lambdas" -a parameters '[{"name":"dbHost","required":"false", "description":"CouchDB host name or IP address"}, {"name":"dbPort","required":"false", "description":"Port number which is listened to by CouchDB"}, {"name":"dbName","required":"false", "description":"Database inside the CouchDB where processed XML are stored"}, {"name":"dbLogin","required":"false", "description":"Login to access the database"}, {"name":"dbPassword","required":"false", "description":"Password to access the database"}]'
  
 echo -e "\n============ Creating Java actions ==============================================\n"
-$CLI action update lambda_demo/validate_xml xml2json.jar  --main test.lambda.openwhisk.actions.LambdaValidateXmlOpenWhisk --web true -p xmlSchemaFile /home/vagrant/demos/DJ/exchange/Build/dist/test.xsd
+$CLI action update lambda_demo/validate_xml xml2json.jar  --main test.lambda.openwhisk.actions.LambdaValidateXmlOpenWhisk --web true -p xmlSchemaFile "/home/vagrant/demos/DJ/exchange/Build/dist/test.xsd"
 $CLI action update lambda_demo/xml2json xml2json.jar  --main test.lambda.openwhisk.actions.LambdaXml2JsonOpenWhisk --web true
  
 echo -e "\n============ Create Java action sequence ========================================\n"

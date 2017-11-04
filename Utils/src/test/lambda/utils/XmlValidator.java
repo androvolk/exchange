@@ -53,10 +53,11 @@ public final class XmlValidator
     {
       log.error ( "XmlValidator::isXmlValid found the problem in XML file: " + e.getMessage () );
       e.printStackTrace ();
+      log.error ( "Leaving XmlValidator::isXmlValid() after failure" );
       return false;
     }
 
-    log.debug ( "Successfully leaving Entering XmlValidator::isXmlValid()" );
+    log.debug ( "Successfully leaving XmlValidator::isXmlValid()" );
     
     return true;
   }
