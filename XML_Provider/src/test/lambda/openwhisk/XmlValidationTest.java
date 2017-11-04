@@ -23,30 +23,10 @@ public class XmlValidationTest
     try
     {
       SchemaFactory factory = SchemaFactory.newInstance ( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-      Schema schema = factory.newSchema ( new File ( "D:\\dimos\\git\\exchange\\Build\\dist\\test.xsd" ) );
+      Schema schema = factory.newSchema ( new File ( args [ 0 ] ) );
       Validator validator = schema.newValidator ();
       XMLInputFactory xmlFactory = XMLInputFactory.newFactory ();
-      XMLEventReader reader = xmlFactory.createXMLEventReader ( new StringReader ( "<?xml version = \"1.0\"?>\n" + 
-          "<class>  \n" + 
-          "   <student rollno = \"393\">\n" + 
-          "      <firstname>Dinkar</firstname>    \n" + 
-          "      <lastname>Kad</lastname>\n" + 
-          "      <nickname>Dinkar</nickname>\n" + 
-          "      <marks>85</marks>  \n" + 
-          "   </student>\n" + 
-          "   <student rollno = \"493\">  \n" + 
-          "      <firstname>Vaneet</firstname>\n" + 
-          "      <lastname>Gupta</lastname>\n" + 
-          "      <nickname>Vinni</nickname>\n" + 
-          "      <marks>95</marks>\n" + 
-          "   </student>\n" + 
-          "   <student rollno = \"593\">    \n" + 
-          "      <firstname>Jasvir</firstname>\n" + 
-          "      <lastname>Singh</lastname>\n" + 
-          "      <nickname>Jazz</nickname>\n" + 
-          "      <marks>90</marks>\n" + 
-          "   </student>\n" + 
-          "</class>" ) );
+      XMLEventReader reader = xmlFactory.createXMLEventReader ( new StringReader ( args [ 1 ] ) );
       validator.validate ( new StAXSource ( reader ) );
     }
     catch ( SAXException | IOException | XMLStreamException e )
