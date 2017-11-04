@@ -1,20 +1,20 @@
 <?xml version = "1.0"?>
-<xs:schema xmlns:xs = "http://www.w3.org/2001/XMLSchema">
-   <xs:element name = 'class'>
-      <xs:complexType>
-         <xs:sequence>
-             <xs:element name = 'student' type = 'StudentType' minOccurs = '0' 
+<xsd:schema xmlns:xsd = "http://www.w3.org/2001/XMLSchema">
+   <xsd:element name = 'class'>
+      <xsd:complexType>
+         <xsd:sequence>
+             <xsd:element name = 'student' type = 'StudentType' minOccurs = '0' 
                 maxOccurs = 'unbounded' />
-         </xs:sequence>
-      </xs:complexType>
-   </xs:element>
-   <xs:complexType name = "StudentType">
-      <xs:sequence>
-         <xs:element name = "firstname" type = "xs:string"/>
-         <xs:element name = "lastname" type = "xs:string"/>
-         <xs:element name = "nickname" type = "xs:string"/>
-         <xs:element name = "marks" type = "xs:positiveInteger"/>
-      </xs:sequence>
-      <xs:attribute name = 'rollno' type = 'xs:positiveInteger'/>
-   </xs:complexType>       
-</xs:schema>
+         </xsd:sequence>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:complexType name = "StudentType">
+      <xsd:sequence>
+         <xsd:element name = "firstname" type = "xsd:string"/>
+         <xsd:element name = "lastname" type = "xsd:string"/>
+         <xsd:element name = "nickname" type = "xsd:string"/>
+         <xsd:element name = "marks" type = "xsd:positiveInteger"/>
+      </xsd:sequence>
+      <xsd:attribute name = 'rollno' type = 'xsd:positiveInteger'/>
+   </xsd:complexType>       
+</xsd:schema>
