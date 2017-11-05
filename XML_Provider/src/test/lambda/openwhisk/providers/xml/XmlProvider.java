@@ -45,6 +45,7 @@ public final class XmlProvider
   private static String dbName = null;
   private static String dbLogin = null;
   private static String dbPassword = null;
+  private static String xmlSchemaFile = null;
   
   // Trigger parameters
   private static String triggerHost = null;
@@ -117,10 +118,12 @@ System.out.println ( "#2 ");//!!!
       else missedParams.add ( "dbPort" );
       if ( params.has ( "dbName" ) ) dbName = params .get ( "dbName" ) .getAsString ();
       else missedParams.add ( "dbName" );
-      if ( params.has ( "dbLogin" ) )  dbLogin = params .get ( "dbLogin" ) .getAsString ();
+      if ( params.has ( "dbLogin" ) ) dbLogin = params .get ( "dbLogin" ) .getAsString ();
       else missedParams.add ( "dbLogin" );
-      if ( params.has ( "dbPassword" ) )  dbPassword = params .get ( "dbPassword" ) .getAsString ();
+      if ( params.has ( "dbPassword" ) ) dbPassword = params .get ( "dbPassword" ) .getAsString ();
       else missedParams.add ( "dbPassword" );
+      if ( params.has ( "xmlSchemaFile" ) ) xmlSchemaFile = params .get ( "xmlSchemaFile" ) .getAsString (); 
+      else missedParams.add ( "xmlSchemaFile" );
       
 System.out.println ( "#3 ");//!!!
 
@@ -139,6 +142,7 @@ System.out.println ("dbPort -> " + dbPort  ); //!!!
 System.out.println ("dbName -> " + dbName  ); //!!!    
 System.out.println ("dbLogin -> " + dbLogin  ); //!!!    
 System.out.println ("dbPassword -> " + dbPassword  ); //!!!    
+System.out.println ("xmlSchemaFile -> " + xmlSchemaFile  ); //!!!    
 
 System.out.println ( "#5 ");//!!!
 

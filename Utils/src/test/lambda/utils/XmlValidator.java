@@ -34,7 +34,7 @@ public final class XmlValidator
   public static boolean isXmlValid ( final String xml, final String schemaFileName )
   {
     log.debug ( String.format ( 
-          "Entering XmlValidator::isXmlValid()  Params: { xml = %s, schemaFileName = %s", xml, schemaFileName ) );
+          "Entering XmlValidator::isXmlValid()  Params: { xml = %s, schemaFileName = %s }", xml, schemaFileName ) );
     try
     {
       if ( factory == null ) factory = SchemaFactory.newInstance ( XMLConstants.W3C_XML_SCHEMA_NS_URI );

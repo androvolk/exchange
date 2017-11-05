@@ -47,7 +47,7 @@ public final class MissedParams
 
 
   @Override
-  public String toString ( )
+  public String toString ()
   {
     if ( ! hasMissedParameters () ) return "No missed parameters! :)";
     

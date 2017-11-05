@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 
 import test.lambda.utils.Convert;
 import test.lambda.utils.CouchDB;
+import test.lambda.utils.Environment;
 import test.lambda.utils.MissedParams;
 import test.lambda.utils.Result;
 import test.lambda.utils.XmlValidator;
@@ -37,6 +38,7 @@ public class LambdaValidateXmlOpenWhisk
 
     log.info ( "XML validation started" );
     log.debug ( "args = " + args );
+    log.debug ( "Action environment = " + Environment.dump () ) ;
     
     if ( args .has ( "id" )) id = args .get ( "id" ) .getAsString ();
     else missedParams.add ( "id" );
