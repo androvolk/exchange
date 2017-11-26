@@ -82,13 +82,25 @@ public final class XmlProvider
 // ---------------------- /hello - Simple ping to be sure that provider is alive  ----------------------------------
     
     // Simple Ping method to see that provider is Ok
-    get ( "/hello", ( req, res ) -> "Hello World" );
+    get ( "/hello", ( req, res ) -> 
+    {
+      log.info ( "'/hello' called" );
+      log.debug ( "Payload - " + req.body () );
+      return "Hello from the web server's belly!";
+    } );
 
     
 // ---------------------- /quit - Shutting down the provider ---------------------------------------------------------
     
     // Shut down the provider
-    post ( "/quit", ( req, res ) -> { isOn = false; stop (); return "Service Stopped!"; } );
+    post ( "/quit", ( req, res ) -> 
+    {
+      log.info ( "'/quit' called" );
+      log.debug ( "Payload - " + req.body () );
+      isOn = false;
+      stop ();
+      return "Service Stopped!"; 
+    } );
 
     
 // ---------------------- /config - Configuring provider -------------------------------------------------------
@@ -98,16 +110,19 @@ public final class XmlProvider
     {
       MissedParams missedParams = new MissedParams ();
 
-      log.info ( "/config PUT payload - " + req.body () );
+      log.info ( "'/config' called" );
+      log.debug ( "Payload - " + req.body () );
 
-      params = Convert.jsonToJsonObject ( req.body () ); //???
-
-System.out.println ( "#1 ");//!!!
+      params = Convert.jsonToJsonObject ( req.body () );
 
       // Validate important parameters
       if ( params == null )
-        return ( Convert.jsonObjectToJson ( Result.failure ( "/config call failed due to parameters!" ) ) );
-System.out.println ( "#2 ");//!!!
+      {
+        String msg = "'/config' call failed due to incorrect parameters!";
+        log.error ( msg );
+        log.debug ( "Payload - " + req.body () );
+        return ( Convert.jsonObjectToJson ( Result.failure ( msg ) ) );
+      }
 
       if ( params.has ( "dirToMonitor" ) )  dirToMonitor = params .get ( "dirToMonitor" ) .getAsString ();
       if ( params.has ( "pollInterval" ) )  pollInterval = params .get ( "pollInterval" ) .getAsInt ();
@@ -125,38 +140,31 @@ System.out.println ( "#2 ");//!!!
       if ( params.has ( "xmlSchemaFile" ) ) xmlSchemaFile = params .get ( "xmlSchemaFile" ) .getAsString (); 
       else missedParams.add ( "xmlSchemaFile" );
       
-System.out.println ( "#3 ");//!!!
-
       if ( missedParams.hasMissedParameters () )
       {
+        String msg = "'/config' - some parameters are missing: ( " + missedParams + " )";
         res.status ( 500 );
-        return Convert.jsonObjectToJson ( 
-                  Result.failure ( "/config - some parameters are missing: ( " + missedParams + " )" ) );
+        log.error ( msg );
+        return Convert.jsonObjectToJson ( Result.failure ( msg ) );
       }
-System.out.println ( "#4 ");//!!!
 
-System.out.println ("dirToMonitor -> " + dirToMonitor  ); //!!!    
-System.out.println ("pollInterval -> " + pollInterval  ); //!!!    
-System.out.println ("dbHost -> " + dbHost  ); //!!!    
-System.out.println ("dbPort -> " + dbPort  ); //!!!    
-System.out.println ("dbName -> " + dbName  ); //!!!    
-System.out.println ("dbLogin -> " + dbLogin  ); //!!!    
-System.out.println ("dbPassword -> " + dbPassword  ); //!!!    
-System.out.println ("xmlSchemaFile -> " + xmlSchemaFile  ); //!!!    
-
-System.out.println ( "#5 ");//!!!
+      log.debug ( String.format ( "Passed Parameters: {\n\tdirToMonitor : %s\n\tpollInterval : %d" +
+              "\n\tdbHost : %s\n\tdbPort : %d\n\tdbName : %s\n\tdbLogin : %s\n\tdbPassword : %s\n\txmlSchemaFile : %s\n}",
+                               dirToMonitor, pollInterval, dbHost, dbPort, dbName, dbLogin, dbPassword, xmlSchemaFile ) );
 
       // Check up if directory exist
       if ( ! ( new File ( dirToMonitor ) ) .exists () )
       {
-        System.err.println ( "Directory '" + dirToMonitor + "' doesn't exist! Configuration failed!" );
-        res.status ( 500 );//???
-        return Convert.jsonObjectToJson ( 
-                  Result.failure ( "/config - Directory '" + dirToMonitor + 
-                                        "' doesn't exist! Configuration failed! " ) );
+        String msg = "Directory '" + dirToMonitor + "' doesn't exist! Configuration failed!";
+        log.error ( msg );
+
+        // Set HTTP return code 500 for marking REST operation as failed
+        res.status ( 500 );
+        return Convert.jsonObjectToJson ( Result.failure ( msg ) );
       }
 
-      return Convert.jsonObjectToJson ( Result.success ( "/config - Confuguration succeeded" ) );
+      log.info ( "'/config' - Configuration completed" );
+      return Convert.jsonObjectToJson ( Result.success ( "'/config' - Configuration succeeded" ) );
     } );
 
  
@@ -166,23 +174,18 @@ System.out.println ( "#5 ");//!!!
     {
       MissedParams missedParams = new MissedParams ();
 
-  System.out.println ( "/register_trigger PUT payload  -> " + req.body () );//!!!
+      log.info ( "'/register_trigger' called" );
+      log.debug ( "Payload - " + req.body () );
 
-      try {
-System.out.println ( "#6 ");//!!!
-System.out.println ( "req.body() -> " + req.body () );//!!!
-
-            params = Convert.jsonToJsonObject ( req.body () );
-System.out.println ( "#7 ");//!!!
-      }//???
+      try { params = Convert.jsonToJsonObject ( req.body () ); }//???
       catch ( Exception e ) 
       { 
-System.out.println ( "#8 ");//!!!
+        String msg = "'/register_trigger' - Unable to parse incoming request:\n" + req.body () + "\n" + e.getMessage ();
+        log.error ( msg );
+
+        // Set HTTP return code 500 for marking REST operation as failed
         res.status ( 500 );//???
-        String msg = e.getMessage ();
-        System.err.println ( "/register_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg );
-        return Convert.jsonObjectToJson (
-            Result.failure ( "/register_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg ) );
+        return Convert.jsonObjectToJson ( Result.failure ( msg ) );
       }
       
       // Validate important parameters
@@ -201,33 +204,33 @@ System.out.println ( "#8 ");//!!!
         int offset = authKey.indexOf ( ':' );
         authKeyLogin = authKey.substring ( 0, offset );
         authKeyPassword = authKey.substring ( ++ offset );
-System.out.println ( "authKeyLogin -> " + authKeyLogin );//!!!
-System.out.println ( "authKeyPassword -> " + authKeyPassword );//!!!
+        log.debug ( String.format ( "authKeyLogin = %s, authKeyPassword = %s", authKeyLogin, authKeyPassword ) );
       }
       else missedParams.add ( "authKey" );
 
       if ( missedParams.hasMissedParameters () )
       {
+        String msg = "'/register_trigger' - some parameters are missing: { " + missedParams + " }";
+        log.error ( msg );
+
+        // Set HTTP return code 500 for marking REST operation as failed
         res.status ( 500 );
-        return Convert.jsonObjectToJson (
-                  Result.failure ( "/register_trigge - some parameters are missing: ( " + missedParams + " )" ) );
+        return Convert.jsonObjectToJson ( Result.failure ( msg  ) );
       }
+
       // Construct valid trigger URL of request parameters
       triggerUrl = "https://" + triggerHost + "/api/v1/namespaces/guest/triggers/" + triggerName;
      
-System.out.println ("triggerHost -> " + triggerHost  ); //!!!    
-System.out.println ("triggerName -> " + triggerName  ); //!!!    
-System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!    
-
-        // Startup directory polling
-        poller = new Thread ( new DirPoller (), "XML-Provider-Dir-Poller" );
+      // Startup directory polling
+      poller = new Thread ( new DirPoller (), "XML-Provider-Dir-Poller" );
 
       // Set busy flag and start the polling thread
       isOn = true;
+      log.debug ( "Polling thread 'poller' is ready to start - " + poller );
       poller.start ();
       
       // Operation succeeded
-      return Convert.jsonObjectToJson ( Result.success ( "/register_trigger - Trigger established" ) );
+      return Convert.jsonObjectToJson ( Result.success ( "'/register_trigger' - Trigger established" ) );
     } );
     
 
@@ -236,31 +239,22 @@ System.out.println ("triggerUrl -> " + triggerUrl  ); //!!!
     put ( "/unregister_trigger", ( req, res ) -> 
     {
       
-  System.out.println ( "/unregister_trigger PUT payload  -> " + req.body () );//!!!
+      log.info ( "'/unregister_trigger' called" );
+      log.debug ( "Payload - " + req.body () );
 
       try { params = Convert.jsonToJsonObject ( req.body () ); }//???
       catch ( Exception e ) 
       { 
-System.out.println ( "Exception - > " + e.getMessage () );//!!!
-
-        String msg = e.getMessage ();
-        System.err.println ( "/unregister_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg );
-        return Convert.jsonObjectToJson (
-            Result.failure ( "/unregister_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + msg ) );
+        String msg = "/unregister_trigger - Unable to parse incoming request:\n" + req.body () + "\n" + e.getMessage ();
+        log.error ( msg );
+        return Convert.jsonObjectToJson ( Result.failure ( msg ) );
       }
 
-System.out.println ( "jsonToJsonObject is OK" );//!!!
-System.out.println ( "params -> " + params ); //!!!
-
-      
       if ( params. has ( "triggerName" ) )
       {
-System.out.println ( "params. has ( \"triggerName\" ) " );//!!!
-System.out.println ( "triggerName -> " + triggerName );//!!!
-System.out.println ( triggerName != null ? triggerName : "null????" );
         if ( triggerName != null && params .get ( "triggerName" ) .getAsString () .equals ( triggerName ) )
         {
-System.out.println ( "triggerName matched" );//!!!
+          log.info ( "Unregistering existing trigger. triggerName : " + triggerName );
 
           isOn = false;
           triggerHost = null;
@@ -269,22 +263,32 @@ System.out.println ( "triggerName matched" );//!!!
           authKeyLogin = null;
           authKeyPassword = null;
         }
-        else { String json =  Convert.jsonObjectToJson ( Result.ignored ( "/unregister_trigger - Trigger unknown. Ignored." ) ) ; System.out.println ( "json -> " + json ); return json;  };
-System.out.println ( "params. has ( \"triggerName\" ) - out" );//!!!
-
+        else 
+        { 
+          String msg = "/unregister_trigger - Trigger unknown. Ignored.";
+          String json =  Convert.jsonObjectToJson ( Result.ignored ( msg ) ) ;
+          log.info ( msg );
+          log.debug ( json );
+          return json;
+        };
       }
-      else return Convert.jsonObjectToJson ( Result.failure ( "/unregister_trigger - Parameter 'triggerName' is missed!" ) );
-System.out.println ( "Before return Result.toJson ( Result.success ( \"/unregister_trigger - Trigger disconnected\" )" );//!!!
+      else
+      {
+        String msg = "/unregister_trigger - Parameter 'triggerName' is missed!";
+        log.error ( msg );
+        return Convert.jsonObjectToJson ( Result.failure ( msg ) );
+      }
       
       // Operation succeeded
-      return Convert.jsonObjectToJson ( Result.success ( "/unregister_trigger - Trigger disconnected" ) );
+      String msg = "/unregister_trigger - Trigger disconnected";
+      log.info ( msg );
+      return Convert.jsonObjectToJson ( Result.success ( msg ) );
     } );
     
     // Add MIME type header to every call's header
     after ( ( req, res ) -> { res.type ( "application/json" ); } );
     
-System.out.println ( "end of main ()" );//!!!
-
+    log.debug ( "End of main() reached" );
   }
 
   
@@ -300,52 +304,56 @@ System.out.println ( "end of main ()" );//!!!
     @Override
     public void run ()
     {
+      log.debug ( "DirPoller::run() called. Polling thread started." );
+
       if ( ! ( new File ( dirToMonitor ) ) .exists () )
       {
-        System.err.println ( "Directory '" + dirToMonitor + 
-                  "' doesn't exist! Call /config once again with correct 'dirToMonitor' parameter." );
+        log.error ( "Directory '" + dirToMonitor + 
+                  "' doesn't exist! Call '/config' once again with correct 'dirToMonitor' parameter." );
         return; 
       }
       
-      System.out.println ( "Polling directory '" + dirToMonitor + "'" );
+      log.info ( "Directory to poll is '" + dirToMonitor + "'" );
       
       try
       {
+        log.info ( "Directory monitoring for XML files started." );
+        
         // Polling keeps going until external signal to stop arrived
         while ( isOn == true )
         {
           
-System.out.print ( '.' ); //!!!
+          log.debug ( "DirPoller is waiting for XML file..." );
 
+          // If files processing is not suspended, proceed. Otherwise just sleep for some time 
           if ( ! isPaused )
           {
-            isBusy = true; //???
+            isBusy = true;
             
+            // Looking for files in monitored directory and choosing XMLs only
             File [] fileList = dir.listFiles ();
             for ( File file : fileList )
             {
-              // Looking for XML file
               if ( file.getName () .toLowerCase () .endsWith ( ".xml" ) )
               {
                 // Store discovered XML in CouchDB, first...
                 JsonObject entries = uploadXmlToCouchDB ( file );
                 if ( entries == null )
                 {
-                  System.err.println ( "DirPoller::run - uploadXmlToCouchDB() returned null unexpectedly!" );
+                  log.error ( "DirPoller::run - uploadXmlToCouchDB() returned null unexpectedly!" );
                   isBusy = false; isOn = false;
                   stop ();
                 }
                 
                 // ... then fire the registered OpenWhisk trigger
                 entries = fireTrigger ( entries );
-
-System.out.println ( "fireTrigger returned -> " + entries ); //!!!                
-                
+                log.info ( "Trigger '" + triggerName + "' fired" );
+                log.debug ( "DirPoller::fireTrigger result - " + entries );
                 break;
               }
             }
 
-            isBusy = false; //???
+            isBusy = false;
           }
 
           // Short pause before next attempt to find the file
@@ -353,7 +361,12 @@ System.out.println ( "fireTrigger returned -> " + entries ); //!!!
         }
       } 
       catch ( InterruptedException | IOException | NoSuchAlgorithmException  e )
-      { System.err.println ( e.getMessage () ); }
+      { 
+        log.error ( "Exception in DirPoller::run - " + e.getMessage () ); 
+        e.printStackTrace ();
+      }
+      
+      log.info ( "Directory monitoring for XML files stopped." );
     }
 
     
@@ -367,43 +380,47 @@ System.out.println ( "fireTrigger returned -> " + entries ); //!!!
       JsonObject value = null;
       JsonObject response = null;
       
-System.out.println ( "File found -> " + xmlToUpload.getCanonicalPath () ); //!!!
+      log.info ( "File found - " + xmlToUpload.getCanonicalPath () );
       
       response = CouchDB.createDocument ( 
                 dbHost, dbPort, dbName, dbLogin, dbPassword, null, "{\"last_processor\":\"XmlProvider\"}" );
-      
-System.out.println ("CouchDB.createDocument response -> " + response  ); //!!!
+
+      log.debug ( "CouchDB.createDocument response - " + response );
       
       if ( Result.isFailed ( response ) )
-      //if ( Result.isFailed ( result ) )
       {
         String msg = "DirPoller::uploadXmlToCouchDB failed to create new document! REST returned: " + 
                                                       Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-        System.err.println ( msg );
+        log.error ( msg );
         return Result.failure ( msg );
       }
       else value = Result.getValue ( response );
 
+      // Need to know document ID and revision to upload the attachment
       String id = value .get ( "id" ) .getAsString ();
       String rev = value .get ( "rev" ) .getAsString ();
-      
-System.out.println ("_id -> " + id  ); //!!!
-System.out.println ("_rev -> " + rev  ); //!!!
+
+      log.info ( String.format ( 
+                  "Document created in database for file. Document ID = %s, revision = %s", id, rev ) );
       
       response = CouchDB.uploadXmlAttachment ( dbHost, dbPort, dbName, dbLogin, dbPassword,
                                                         id, rev, "XML", xmlToUpload.getCanonicalPath () );
 
-System.out.println ("CouchDB.createDocumentAttachment response -> " + response  ); //!!!
+      log.debug ( "CouchDB::uploadXmlAttachment result - " + response );
 
       if ( Result.isFailed ( response ) )
       {
-        String msg = "DirPoller::uploadXmlToCouchDB failed to upload attachment! REST returned: " + 
+        String msg = "DirPoller::uploadXmlToCouchDB failed to upload attachment! Reason: " + 
                                                       Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-        System.err.println ( msg );
+        log.error ( msg );
         return Result.failure ( msg );
       }
       else
       {
+        log.info ( String.format ( 
+              "File uploadeded to database and attached to document. Document ID = %s, new revision = %s",
+                                                                  id, response .get ( "rev" ) .getAsString () ) );
+        // Delete processed file from the monitored directory
         xmlToUpload.delete ();
         return response;
       }
@@ -422,13 +439,13 @@ System.out.println ("CouchDB.createDocumentAttachment response -> " + response  
                      "{\"id\":\"" + Result.getValue ( params ) .get ( "id" ) .getAsString () + 
                            "\",\"rev\":\"" + Result.getValue ( params ) .get ( "rev" ) .getAsString () + "\"}" );
 
-System.out.println ("CallRestService.put response -> " + response  ); //!!!
+    log.debug ( "CallRestService::post result - " + response );
 
     if ( Result.isFailed ( response ) )
     {
       String msg = "DirPoller::fireTrigger failed to fire trigger! REST returned: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
     else return response;

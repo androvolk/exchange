@@ -32,7 +32,7 @@ public class LambdaValidateXmlOpenWhisk
     String xmlSchemaFile = null;
     
     JsonObject response = null;
-    JsonObject result = null;
+//    JsonObject result = null;
 
     MissedParams missedParams = new MissedParams (); 
 

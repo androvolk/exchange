@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 
 import test.lambda.utils.Convert;
 import test.lambda.utils.CouchDB;
+import test.lambda.utils.Environment;
 import test.lambda.utils.MissedParams;
 import test.lambda.utils.Result;
 import test.lambda.utils.Xml2Json;
@@ -34,6 +35,10 @@ public final class LambdaXml2JsonOpenWhisk
 
     MissedParams missedParams = new MissedParams (); 
 
+    log.info ( "XML to JSON conversion started" );
+    log.debug ( "args = " + args );
+    log.debug ( "Action environment = " + Environment.dump () ) ;
+
     if ( args .has ( "id" )) id = args .get ( "id" ) .getAsString ();
     else missedParams.add ( "id" );
     if ( args .has ( "rev" )) rev = args .get ( "rev" ) .getAsString ();
@@ -51,10 +56,16 @@ public final class LambdaXml2JsonOpenWhisk
     else missedParams.add ( "dbPassword" );
     
     if ( missedParams.hasMissedParameters () )
-         return  Result.failure ( "LambdaXml2JsonOpenWhisk - some parameters are missing: ( " + missedParams + " )" );
+    {
+      String msg = "LambdaXml2JsonOpenWhisk - some parameters are missing: ( " + missedParams + " )"; 
+      log.info ( "XML conversion failed" );
+      log.error ( "args = " + args );
+      return  Result.failure ( msg );
+    }
 
-System.out.println ( "Xml2Json id -> " + id);//!!
-System.out.println ( "Xml2Json rev -> " + rev);
+    log.debug ( String.format ( "LambdaXml2JsonOpenWhisk parameters: { id = %s, rev = %s, dbHost = %s, " + 
+        "dbPort = %d, dbName = %s, dbLogin = %s, dbPassword = %s }",
+        id, rev, dbHost, dbPort, dbName, dbLogin, dbPassword ) );
 
     // Getting XML from CouchDB by it's id and revision
     try
@@ -64,7 +75,7 @@ System.out.println ( "Xml2Json rev -> " + rev);
     catch ( NoSuchAlgorithmException | IOException e )
     {
       String msg = "CouchDB::downloadXmlAttachment generated exception! Reason: " + e.getMessage ();
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
 
@@ -72,32 +83,32 @@ System.out.println ( "Xml2Json rev -> " + rev);
     {
       String msg = "CouchDB::downloadXmlAttachment failed to download XML attachment! Reason: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
 
     // Getting XML out of reply
     xml = Result.getValue ( response ) .get ( "value" ) .getAsString ();
 //    xml = Convert.jsonObjectToJson ( Result.getValue ( response ) );
-System.out.println ( "Downloaded XML -> " + xml ); //!!!   
+    log.debug ( "Downloaded XML:\n" + xml );  
     
     // XML should not be null
     if ( xml == null )
     {
       String msg = "CouchDB::downloadXmlAttachment returned response with null as value!"; 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
 
     // Passing the xml to the global converter
     json = Xml2Json.convertXml2Json ( xml );
-System.out.println ( "Converted JSON -> " + json ); //!!!   
+    log.debug ( "Converted JSON:\n" + json );
 
     // JSON should not be null if converter did his job well
     if ( json == null )
     {
       String msg = "Xml2Json::convertXml2Json failed to convert XML into JSON and returned null!"; 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
     
@@ -109,23 +120,22 @@ System.out.println ( "Converted JSON -> " + json ); //!!!
     catch ( NoSuchAlgorithmException | IOException e )
     {
       String msg = "CouchDB::uploadJsonAttachment generated exception! Reason: " + e.getMessage ();
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
     
     
-    // Forming resulting JSON object with 'result' element having JSON-ified XML as its value 
+    // Checking  resulting JSON object 
     if ( Result.isFailed ( response ) )
     {
       String msg = "CouchDB::uploadJsonAttachment failed to upload JSON attachment! Reason: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
-    else rev = Result.getValue ( response ) .get ( "rev" ) .getAsString ();
+ //   else rev = Result.getValue ( response ) .get ( "rev" ) .getAsString ();
 
-System.out.println ("_id -> " + id  ); //!!!
-System.out.println ("_rev -> " + rev  ); //!!!
+    log.info ( "XML conversion to JSON was successful" );
 
     return  response;
   }
