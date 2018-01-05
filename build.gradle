@@ -1,0 +1,86 @@
+description = 'OpenWhisk demo of lambdas'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+project.buildDir = 'bin'
+
+defaultTasks 'jar'
+
+ext {
+  cleanupText = 'Cleaning up '
+  compilationText = 'Compiling '
+  libs = '../Libraries/'
+  sl4jLibs = libs + 'sl4j/'
+  OkHttpLibs = libs + 'OkHttp/'
+  ServletApiLibs = libs + 'Servlet API/'
+  GsonLibs = libs + 'Gson/'
+  JsonLibs = libs + 'JSON-Java/'
+  SparkJavaLibs = libs + 'Spark-Java/'
+  JettyLibs = libs + 'Jetty/'
+  WebSocketLibs = libs + 'WebSocket/'
+}
+
+
+sourceSets {
+  main {
+    java {
+      srcDirs = [ 'Utils/src', 'XML_Feed_Action/src', 'XML_Provider/src', 'XML2JSON_Action/src' ]
+      outputDir = file ( 'bin' )
+/*      compileClasspath = files ( sl4jLibs + 'logback-classic-1.2.3.jar',
+                                 sl4jLibs + 'logback-core-1.2.3.jar',
+                                 sl4jLibs + 'slf4j-api-1.7.25.jar',
+                                 OkHttpLibs + 'okhttp-3.9.1.jar',
+                                 OkHttpLibs + 'okio-1.13.0.jar',
+                                 ServletApiLibs + 'javax.servlet-api-4.0.0.jar',
+                                 GsonLibs + 'gson-2.8.2.jar',
+                                 JsonLibs + 'json-20170516.jar',
+                                 SparkJavaLibs + 'spark-core-2.7.1.jar',
+                                 JettyLibs + 'jetty-client-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-http-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-io-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-security-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-server-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-servlet-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-util-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-webapp-9.4.7.v20170914.jar',
+                                 JettyLibs + 'jetty-xml-9.4.7.v20170914.jar',
+                                 WebSocketLibs + 'websocket-api-9.4.7.v20170914.jar',
+                                 WebSocketLibs + 'websocket-client-9.4.7.v20170914.jar',
+                                 WebSocketLibs + 'websocket-common-9.4.7.v20170914.jar',
+                                 WebSocketLibs + 'websocket-server-9.4.7.v20170914.jar',
+                                 WebSocketLibs + 'websocket-servlet-9.4.7.v20170914.jar' ) */
+    }
+  }
+}
+
+
+repositories {
+  jcenter ()
+}
+
+
+dependencies {
+  compile 'org.slf4j:slf4j-api:1.7.25+'
+  compile 'ch.qos.logback:logback-classic:1.2.3+'
+  compile 'ch.qos.logback:logback-core:1.2.3+'
+  compile 'com.squareup.okhttp3:okhttp:3.9.1+'
+  compile 'com.google.code.gson:gson:2.8.2+'
+  compile 'org.json:json:20170516'
+  compile 'com.sparkjava:spark-core:2.7.1+'
+}
+
+
+jar {
+  manifest {
+    attributes "Main-Class": "lambda.openwhisk.providers.xml.XmlProvider"
+  }
+  from {
+    configurations.compile.collect { it.isDirectory () ? it : zipTree ( it ) }
+  }
+  archiveName = 'xml2json.jar'
+  excludes = [ 'tmp', 'about.html', 'jetty-dir.css' ]
+  destinationDir = file ( 'Build/dist' )
+  doLast { delete buildDir.name }  
+}

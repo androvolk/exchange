@@ -1,21 +1,18 @@
 package test.lambda.utils;
 
 import java.io.IOException;
-//import java.nio.file.Files;
-//import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-//import java.util.Base64;
-//import java.util.List;
-//import java.util.Map;
 
-//import javax.xml.bind.DatatypeConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public final class CouchDB
 {
-  
+  private static final Logger log = LoggerFactory.getLogger ( CouchDB.class );
+
   /**
    * Generate URL for calling CouchDB REST API
    * @param host
@@ -55,12 +52,14 @@ public final class CouchDB
     
     response = CallRestService.get (  makeUrl ( host, port, null, "/_uuids", login, password ) );
     if ( Result.isFailed ( response ) ) return null;
-System.out.println ( "uuids response -> " + response );//!!!
+    
+    log.debug ( "uuids response: " + response );
+
     JsonArray uuids = Result.getValue ( response ) .get ( "uuids" ) .getAsJsonArray ();
-System.out.println ( "uuids = " + uuids );//!!!
+    
     if ( uuids == null )
     {
-      System.err.println ( "CouchDB::getUuid failed to provide the UUID! REST returned: " + Result.getValue ( response ) );
+      log.error ( "CouchDB::getUuid failed to provide the UUID! REST returned: " + Result.getValue ( response ) );
       return null;
     }
 
@@ -68,6 +67,32 @@ System.out.println ( "uuids = " + uuids );//!!!
   }
 
 
+  public static String getLastDocRevision ( final String host, final int port, final String dataBase,
+                                                          final String login, final String password, final String id )
+                                                                                                          throws IOException
+  {
+    JsonObject response = null;
+    String uuid = null;
+    
+    response = CallRestService.get ( makeUrl ( 
+                    host, port, dataBase, "/" + ( id != null ? id : uuid ) , login, password ) );
+
+    if ( Result.isFailed ( response ) )
+    {
+      String msg = "CouchDB::getLastDocRevision failed to retrieve document information! REST returned: " + 
+                                                    Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
+      log.error ( msg );
+      return null;
+    }
+    else
+    {
+      log.debug ( "CouchDB::getLastDocRevision response: " + response );
+      //TODO: Start here!!!
+return "";//      return response.;
+    }
+  }
+  
+  
   /**
    * Asks CouchDB to create new document. 
    * @param host
@@ -80,7 +105,7 @@ System.out.println ( "uuids = " + uuids );//!!!
    * @return
    * @throws IOException
    */
-  public static JsonObject createDocument (  final String host, final int port, final String dataBase,
+  public static JsonObject createDocument ( final String host, final int port, final String dataBase,
                                          final String login, final String password, final String id, final String jsonDocument )
                                                                                                              throws IOException
   {
@@ -90,10 +115,13 @@ System.out.println ( "uuids = " + uuids );//!!!
     if ( id == null )
     {
       uuid = getUuid ( host, port, login, password );
-      if ( uuid == null ) return Result.failure ( 
-                    "CouchDB::createDocument - getUuide() was unable go generate ID for document!" );
+      if ( uuid == null )
+      {
+        String msg = "CouchDB::createDocument - getUuide() was unable go generate ID for document!";
+        log.error ( msg );
+        return Result.failure ( msg );
+      }
     }
-    
     
     response = CallRestService.put ( makeUrl ( 
                     host, port, dataBase, "/" + ( id != null ? id : uuid ) , login, password ), jsonDocument );
@@ -102,10 +130,14 @@ System.out.println ( "uuids = " + uuids );//!!!
     {
       String msg = "CouchDB::createDocument failed to create new document! REST returned: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
-    else return response;
+    else
+    {
+      log.debug ( "CouchDB::createDocument response: " + response );
+      return response;
+    }
   }
 
   
@@ -138,10 +170,14 @@ System.out.println ( "uuids = " + uuids );//!!!
     {
       String msg = "CouchDB::uploadXmlAttachment failed to add attachment! REST returned: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
-    else return response;
+    else
+    {
+      log.debug ( "CouchDB::uploadXmlAttachment response: " + response );
+      return response;
+    }
   }
 
 
@@ -174,10 +210,14 @@ System.out.println ( "uuids = " + uuids );//!!!
     {
       String msg = "CouchDB::uploadJsonAttachment failed to add attachment! REST returned: " + 
                                                     Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-      System.err.println ( msg );
+      log.error ( msg );
       return Result.failure ( msg );
     }
-    else return response;
+    else
+    {
+      log.debug ( "CouchDB::uploadJsonAttachment response: " + response );
+      return response;
+    }
   }
 
 
@@ -209,10 +249,14 @@ System.out.println ( "uuids = " + uuids );//!!!
       {
         String msg = "CouchDB::downloadXmlAttachment failed to get attachment! REST returned: " + 
                                                       Convert.jsonObjectToJson ( Result .getValue ( response ) ); 
-        System.err.println ( msg );
+        log.error ( msg );
         return Result.failure ( msg );
       }
-      else return response;
+      else
+      {
+        log.debug ( "CouchDB::downloadXmlAttachment response: " + response );
+        return response;
+      }
     }
    
     

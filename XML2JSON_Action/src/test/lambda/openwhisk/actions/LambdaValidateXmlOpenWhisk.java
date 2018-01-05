@@ -56,8 +56,9 @@ public class LambdaValidateXmlOpenWhisk
     if ( args.has ( "dbPassword" ) )  dbPassword = args .get ( "dbPassword" ) .getAsString ();
     else missedParams.add ( "dbPassword" );
 
-    if ( args.has ( "xmlSchemaFile" ) ) xmlSchemaFile = args .get ( "xmlSchemaFile" ) .getAsString ();
-    else missedParams.add ( "xmlSchemaFile" );
+    // Wrong!! We're reading the schema from CouchDB now!!!
+//    if ( args.has ( "xmlSchemaFile" ) ) xmlSchemaFile = args .get ( "xmlSchemaFile" ) .getAsString ();
+//    else missedParams.add ( "xmlSchemaFile" );
     
     
     if ( missedParams.hasMissedParameters () )
@@ -72,6 +73,8 @@ public class LambdaValidateXmlOpenWhisk
                                 "dbPort = %d, dbName = %s, dbLogin = %s, dbPassword = %s, xmlSchemaFile = %s }",
                                 id, rev, dbHost, dbPort, dbName, dbLogin, dbPassword, xmlSchemaFile ) );
 
+    //TODO: Getting XML Schema from CouchDB
+    
     // Getting XML from CouchDB by it's id and revision
     try
     {

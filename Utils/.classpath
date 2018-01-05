@@ -6,7 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/sl4j"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gson"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Spark-Java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jetty"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

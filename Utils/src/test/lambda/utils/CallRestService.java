@@ -3,6 +3,9 @@ package test.lambda.utils;
 import java.io.File;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.JsonObject;
 
 import okhttp3.Credentials;
@@ -14,6 +17,8 @@ import okhttp3.Response;
 
 public final class CallRestService
 {
+  private static final Logger log = LoggerFactory.getLogger ( CallRestService.class );
+
   private static MediaType JSON = null;
   private static OkHttpClient client = null;
 
@@ -31,9 +36,14 @@ public final class CallRestService
         .build ();
 
     if ( client == null ) client = new OkHttpClient ();
+   
+    log.debug ( "GET request: " + request );
     
     try ( Response response = client .newCall ( request ) .execute () )
-    { return decodeResponse ( response, false ); }
+    { 
+      log.info ( "Called: GET " + url );
+      return decodeResponse ( response, false ); 
+    }
   }
 
 
@@ -51,9 +61,6 @@ public final class CallRestService
   {
     if ( JSON == null ) JSON = MediaType.parse ( "application/json; charset=utf-8" );
 
-System.out.println ( "POST URL -> " + url );//!!!
-System.out.println ( "POST payload  -> " + payload );//!!!    
-
     RequestBody body = RequestBody.create ( JSON, payload );
     Request request = new Request.Builder ()
         .url ( url )
@@ -63,10 +70,12 @@ System.out.println ( "POST payload  -> " + payload );//!!!
 
     if ( client == null ) client = new OkHttpClient ();
 
-System.out.println ( "POST request  -> " + request );//!!!    
+    log.debug ( "POST request: " + request );
 
     try ( Response response = client .newCall ( request ) .execute () )
-    { return decodeResponse ( response, false ); }
+    { 
+      log.info ( "Called: POST " + url );
+      return decodeResponse ( response, false ); }
   }
 
 
@@ -78,12 +87,8 @@ System.out.println ( "POST request  -> " + request );//!!!
    * @throws IOException
    */
   public static JsonObject put ( final String url, final String payload ) throws IOException
-//  public static String put ( final String url, final String payload ) throws IOException
   {
     if ( JSON == null ) JSON = MediaType.parse ( "application/json; charset=utf-8" );
-
-System.out.println ( "PUT URL -> " + url );//!!!
-System.out.println ( "PUT payload  -> " + payload );//!!!    
 
     RequestBody body = RequestBody.create ( JSON, payload );
     Request request = new Request.Builder ()
@@ -93,10 +98,13 @@ System.out.println ( "PUT payload  -> " + payload );//!!!
 
     if ( client == null ) client = new OkHttpClient ();
 
-System.out.println ( "PUT request  -> " + request );//!!!    
+    log.debug ( "PUT request: " + request );
 
     try ( Response response = client .newCall ( request ) .execute () )
-    { return decodeResponse ( response, false ); }
+    { 
+      log.info ( "Called: PUT " + url );
+      return decodeResponse ( response, false ); 
+    }
   }
 
 
@@ -116,9 +124,14 @@ System.out.println ( "PUT request  -> " + request );//!!!
         .build ();
 
     if ( client == null ) client = new OkHttpClient ();
-    
+
+    log.debug ( "GET request: " + request );
+
     try ( Response response = client .newCall ( request ) .execute () )
-    { return decodeResponse ( response, true ); }
+    { 
+      log.info ( "Called: GET " + url );
+      return decodeResponse ( response, true );
+    }
   }
 
 
@@ -142,14 +155,15 @@ System.out.println ( "PUT request  -> " + request );//!!!
         .put ( body )
         .build ();
     
-System.out.println ( "Request: " + request.toString () );  //!!!
-System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
+    log.debug ( "PUT request: " + request );
 
     if ( client == null ) client = new OkHttpClient ();
     
     try ( Response response = client .newCall ( request ) .execute () )
-    { return decodeResponse ( response, false ); }
-
+    { 
+      log.info ( "Called: PUT " + url );
+      return decodeResponse ( response, false );
+    }
   }
 
   
@@ -172,14 +186,15 @@ System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
         .put ( body )
         .build ();
     
-System.out.println ( "Request: " + request.toString () );  //!!!
-System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
+    log.debug ( "PUT request: " + request );
 
     if ( client == null ) client = new OkHttpClient ();
     
     try ( Response response = client .newCall ( request ) .execute () )
-    { return decodeResponse ( response, false ); }
-
+    {
+      log.info ( "Called: PUT " + url );
+      return decodeResponse ( response, false );
+    }
   }
 
   
@@ -233,40 +248,50 @@ System.out.println ( "Headers: "  + request.headers () .toString () ); //!!!
     JsonObject result = null;
     JsonObject value = null;
     
-System.out.println ( "Inside the CallRestService::decodeResponse" );//!!!
-System.out.println ( "response code -> " + response.code () );//!!!
-     
+    log.debug ( "CallRestService::decodeResponse() called" );
+    
     // Result processing depends on whether it is plain text or JSON
     if ( isPlain == true )
     {
+      log.debug ( "Plain text value asked" );
+      
       value = new JsonObject ();
       String xml = new String ( response .body () .bytes () ); //???
-System.out.println ( "XML out of bytes -> "  + xml ); //!!!
+      
+      log.debug ( "XML out of body bytes: " + xml );
+
       value.addProperty ( "value",  xml );
       //        value.addProperty ( "value",  response .body () .string () );
     }
     else
     {
+      log.debug ( "JSON value asked" );
+      
       body = response .body () .string ();
+
+      log.debug ( "JSON out of body: " + body );
+
       value = Convert.jsonToJsonObject ( body );
     }
     
     // Code result depending on success or failure
     if ( response.isSuccessful () )
     {
-System.out.println ( "CallRestService::decodeResponse - success" );//!!!
-System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
+      log.debug ( "CallRestService::decodeResponse - success" );
+      log.debug ( "CallRestService::decodeResponse - value:" + value );
+
       result = Result.success ( value );
     }
     else
     {
-System.err.println ( "CallRestService::decodeResponse - failure" );//!!!
-System.out.println ( "CallRestService::decodeResponse - value:" + value );//!!!
+      log.debug ( "CallRestService::decodeResponse - failure" );
+      log.debug ( "CallRestService::decodeResponse - value:" + value );
+      
       result = Result.failure ( value );
     }
 
-System.out.println ( "Leaving the CallRestService::decodeResponse" );//!!!
-    
+    log.debug ( "Leaving the CallRestService::decodeResponse" );
+
     return result;
   }
 

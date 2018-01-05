@@ -163,6 +163,11 @@ public final class XmlProvider
         return Convert.jsonObjectToJson ( Result.failure ( msg ) );
       }
 
+      //TODO: Check if XML Schema already exist in CouchDB
+      //TODO: Delete if it does
+      //TODO: Create new document for XML Schema
+      //TODO: Upload XML Schema as attachment
+      
       log.info ( "'/config' - Configuration completed" );
       return Convert.jsonObjectToJson ( Result.success ( "'/config' - Configuration succeeded" ) );
     } );
